@@ -1,0 +1,45 @@
+﻿@using System.Linq.Expressions
+@using Masb.Mvc.TableBuilder.Code
+@using Masb.Mvc.TableBuilder.Models
+@model Masb.Mvc.TableBuilder.Models.TableViewModel
+@{
+    this.ViewBag.Title = "Sample Table Page";
+    this.Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@{
+    var tableTemplate = this.Html.TableTemplateFor(m => m.Rows)
+        .AddColumn(m => m.PersonName, @<div>@item.Meta.GetDisplayName()</div>, @<div>@item.Html.EditorFor(m => m)</div>)
+        .AddColumn(m => m.BirthData, @<div>@item.Meta.GetDisplayName()</div>, @<div>@item.Html.EditorFor(m => m)</div>)
+        ;
+}
+@{
+    var table = this.Html.Table(tableTemplate);
+    <table>
+        @{
+            var header = table.Header;
+            <thead>
+                <tr>
+                    @foreach (var headerColumn in header.Cells)
+                    {
+                        <th>
+                            @headerColumn.Render()
+                        </th>
+                    }
+                </tr>
+            </thead>
+        }
+        <tbody>
+            @foreach (var item in table.Items)
+            {
+                <tr>
+                    @foreach (var itemColumn in item.Cells)
+                    {
+                        <td>
+                            @itemColumn.Render()
+                        </td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+}
