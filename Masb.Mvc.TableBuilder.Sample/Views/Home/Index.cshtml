@@ -12,7 +12,7 @@
         .AddColumnFor(m => m.Age, @<div>@item.Meta.GetDisplayName()</div>, @<div>@item.Html.EditorFor(m => m)</div>)
         .AddColumn(
             @<div>Male/Female property</div>,
-            @<div>@(item.Model.Gender == GenderKinds.Male
+            @<div>@(item.Model == null || item.Model.Gender == GenderKinds.Male
                         ? item.Html.EditorFor(m => m.MaleProp)
                         : item.Html.EditorFor(m => m.FemaleProp))</div>)
         ;
@@ -45,6 +45,15 @@
                     }
                 </tr>
             }
+            <tr>
+                @{ var newItem = table.NewItem(int.MaxValue, null); }
+                @foreach (var itemColumn in newItem.Cells)
+                {
+                    <td>
+                        @itemColumn.Render()
+                    </td>
+                }
+            </tr>
         </tbody>
     </table>
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Web.Mvc;
 using System.Web.WebPages;
 
@@ -33,7 +34,16 @@ namespace Masb.Mvc.TableBuilder
 
             public HelperResult Visit<TSubProperty>(ITableColumnTemplate<TCollectionItem, TSubProperty> value)
             {
-                var model = value.Expression.Compile()(this.html.ViewData.Model);
+                var rootModel = this.html.ViewData.Model;
+                var modelGetter = value.Expression.Compile();
+                TSubProperty model = default(TSubProperty);
+                try
+                {
+                    model = modelGetter(rootModel);
+                }
+                catch (NullReferenceException ex)
+                {
+                }
 
                 var viewData = new ViewDataDictionary<TSubProperty>(model)
                 {

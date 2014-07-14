@@ -29,54 +29,59 @@ namespace Masb.Mvc.TableBuilder
             {
                 var getter = this.tableTemplate.Expression.Compile();
                 IEnumerable<TCollectionItem> collection = getter(this.html.ViewData.Model);
-
-                var result = collection.Select(
-                    (item, i) =>
-                    {
-                        Expression<Func<TModel, TCollectionItem>> indexerLambda;
-                        {
-                            var expression = this.tableTemplate.Expression;
-                            var lambda = expression as LambdaExpression;
-                            var body = lambda.Body;
-                            if (body.NodeType == ExpressionType.Convert)
-                                body = ((UnaryExpression)body).Operand;
-
-                            var indexer = Expression.Call(
-                                body,
-                                // TODO: the indexer is not always named "Item"
-                                "get_Item",
-                                new Type[0],
-                                new Expression[] { Expression.Constant(i) });
-
-                            indexerLambda = Expression.Lambda<Func<TModel, TCollectionItem>>(indexer, lambda.Parameters);
-                        }
-
-                        var viewData = new ViewDataDictionary<TCollectionItem>(item)
-                        {
-                            TemplateInfo =
-                            {
-                                HtmlFieldPrefix = this.html.ViewContext.ViewData.TemplateInfo.GetFullHtmlFieldName(
-                                    ExpressionHelper.GetExpressionText(indexerLambda))
-                            },
-                            ModelMetadata = ModelMetadata.FromLambdaExpression(
-                                indexerLambda,
-                                this.html.ViewData)
-                        };
-
-                        var viewContext = new ViewContext(
-                            this.html.ViewContext,
-                            this.html.ViewContext.View,
-                            viewData,
-                            this.html.ViewContext.TempData,
-                            this.html.ViewContext.Writer);
-
-                        var viewTemplate = new ViewTemplate<TCollectionItem>(viewData, viewContext);
-
-                        var row = new TableDataRowRenderer<TCollectionItem>(this.tableTemplate.Columns, viewTemplate.Html);
-                        return row;
-                    });
+                var result = collection.Select(this.CreateItem);
                 return result;
             }
+        }
+
+        public TableDataRowRenderer<TCollectionItem> NewItem(int index, TCollectionItem item)
+        {
+            return this.CreateItem(item, index);
+        }
+
+        private TableDataRowRenderer<TCollectionItem> CreateItem(TCollectionItem item, int index)
+        {
+            Expression<Func<TModel, TCollectionItem>> indexerLambda;
+            {
+                var expression = this.tableTemplate.Expression;
+                var lambda = expression as LambdaExpression;
+                var body = lambda.Body;
+                if (body.NodeType == ExpressionType.Convert)
+                    body = ((UnaryExpression)body).Operand;
+
+                var indexer = Expression.Call(
+                    body,
+                    // TODO: the indexer is not always named "Item"
+                    "get_Item",
+                    new Type[0],
+                    new Expression[] { Expression.Constant(index) });
+
+                indexerLambda = Expression.Lambda<Func<TModel, TCollectionItem>>(indexer, lambda.Parameters);
+            }
+
+            var viewData = new ViewDataDictionary<TCollectionItem>(item)
+            {
+                TemplateInfo =
+                {
+                    HtmlFieldPrefix = this.html.ViewContext.ViewData.TemplateInfo.GetFullHtmlFieldName(
+                        ExpressionHelper.GetExpressionText(indexerLambda))
+                },
+                ModelMetadata = ModelMetadata.FromLambdaExpression(
+                    indexerLambda,
+                    this.html.ViewData)
+            };
+
+            var viewContext = new ViewContext(
+                this.html.ViewContext,
+                this.html.ViewContext.View,
+                viewData,
+                this.html.ViewContext.TempData,
+                this.html.ViewContext.Writer);
+
+            var viewTemplate = new ViewTemplate<TCollectionItem>(viewData, viewContext);
+
+            var row = new TableDataRowRenderer<TCollectionItem>(this.tableTemplate.Columns, viewTemplate.Html);
+            return row;
         }
 
         private class TableHeaderRowRendererCreator :

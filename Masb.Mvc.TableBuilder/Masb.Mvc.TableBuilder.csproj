@@ -74,6 +74,7 @@
     <Compile Include="IViewTemplate.cs" />
     <Compile Include="Renderers\ITableDataCellRenderer.cs" />
     <Compile Include="Renderers\ITableDataRowRenderer.cs" />
+    <Compile Include="Renderers\ITableRenderer.cs" />
     <Compile Include="Renderers\TableDataCellRenderer.cs" />
     <Compile Include="Renderers\TableDataRowRenderer.cs" />
     <Compile Include="Renderers\TableHeaderCellRenderer.cs" />

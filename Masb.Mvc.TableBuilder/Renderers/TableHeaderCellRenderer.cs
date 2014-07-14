@@ -20,7 +20,8 @@ namespace Masb.Mvc.TableBuilder
             return result;
         }
 
-        private class HelperResultCreator : ITableColumnTemplateVisitor<HelperResult>
+        private class HelperResultCreator :
+            ITableColumnTemplateVisitor<HelperResult>
         {
             private readonly HtmlHelper html;
 
