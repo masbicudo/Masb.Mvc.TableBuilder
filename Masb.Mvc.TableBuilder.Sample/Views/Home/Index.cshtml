@@ -19,7 +19,7 @@
 }
 @{
     var table = this.Html.Table(tableTemplate) as ITableRenderer;
-    <table id="@table.Html.ViewData.TemplateInfo.GetFullHtmlFieldId("Table")">
+    <table id="@table.Html.ViewData.TemplateInfo.GetFullHtmlFieldId("")">
         @{
             var allItems = table.Items.Select(item => item.Html.ViewData.Model).ToArray();
             var header = table.Header;
@@ -37,7 +37,7 @@
         <tbody>
             @foreach (var item in table.Items)
             {
-                <tr id="@item.Html.ViewData.TemplateInfo.GetFullHtmlFieldId("Row")">
+                <tr id="@item.Html.ViewData.TemplateInfo.GetFullHtmlFieldId("")">
                     @item.RenderIndexHiddenField()
                     @foreach (var itemColumn in item.Cells)
                     {

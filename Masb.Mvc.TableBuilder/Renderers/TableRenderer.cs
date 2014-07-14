@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Web.Mvc;
 
 namespace Masb.Mvc.TableBuilder
@@ -67,14 +68,60 @@ namespace Masb.Mvc.TableBuilder
                 if (body.NodeType == ExpressionType.Convert)
                     body = ((UnaryExpression)body).Operand;
 
-                var indexer = Expression.Call(
-                    body,
-                    // TODO: the indexer is not always named "Item"
-                    "get_Item",
-                    new Type[0],
-                    new Expression[] { Expression.Constant(index) });
+                if (body.Type.IsArray)
+                {
+                    var indexer = Expression.ArrayIndex(
+                        body,
+                        Expression.Constant(index));
 
-                indexerLambda = Expression.Lambda<Func<TModel, TCollectionItem>>(indexer, lambda.Parameters);
+                    indexerLambda = Expression.Lambda<Func<TModel, TCollectionItem>>(indexer, lambda.Parameters);
+                }
+                else
+                {
+                    var indexerTypes = new[]
+                    {
+                        typeof(int),
+                        typeof(uint),
+                        typeof(long),
+                        typeof(ulong),
+                        typeof(ushort),
+                        typeof(short),
+                        typeof(sbyte),
+                        typeof(byte)
+                    };
+
+                    // getting indexer get method:
+                    // reference: http://stackoverflow.com/questions/6759416/accessing-indexer-from-expression-tree
+                    var indexerPropInfos = (from pi in body.Type.GetDefaultMembers().OfType<PropertyInfo>()
+                                            where pi.PropertyType == typeof(TCollectionItem) && pi.CanRead
+                                            let args = pi.GetIndexParameters()
+                                            where args.Length == 1 && args[0].ParameterType == typeof(int)
+                                            let argsType = args[0].ParameterType
+                                            where indexerTypes.Contains(argsType)
+                                            select new { pi, argsType }).ToDictionary(x => x.argsType, x => x.pi);
+
+                    var indexerPropInfo = indexerTypes.Select(
+                        x =>
+                        {
+                            PropertyInfo pi;
+                            indexerPropInfos.TryGetValue(x, out pi);
+                            return pi;
+                        })
+                        .FirstOrDefault(pi => pi != null);
+
+                    if (indexerPropInfo == null)
+                        throw new Exception(string.Format(
+                            "Indexer accepting an integer argument and returning {0} was not found in type {1}.",
+                            typeof(TCollectionItem).Name,
+                            body.Type.Name));
+
+                    var indexer = Expression.Call(
+                        body,
+                        indexerPropInfo.GetGetMethod(),
+                        new Expression[] { Expression.Constant(index) });
+
+                    indexerLambda = Expression.Lambda<Func<TModel, TCollectionItem>>(indexer, lambda.Parameters);
+                }
             }
 
             var viewData = new ViewDataDictionary<TCollectionItem>(item)
