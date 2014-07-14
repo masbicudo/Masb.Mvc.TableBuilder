@@ -7,5 +7,9 @@ namespace Masb.Mvc.TableBuilder
         TableHeaderRowRenderer Header { get; }
 
         IEnumerable<ITableDataRowRenderer> Items { get; }
+
+        ITableDataRowRenderer NewItem(int index, object defaultModel);
+
+        ITableDataRowRenderer NewItem(int index);
     }
 }

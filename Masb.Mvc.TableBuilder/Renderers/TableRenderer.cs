@@ -29,9 +29,19 @@ namespace Masb.Mvc.TableBuilder
             {
                 var getter = this.tableTemplate.Expression.Compile();
                 IEnumerable<TCollectionItem> collection = getter(this.html.ViewData.Model);
-                var result = collection.Select((item, index) => this.CreateItem(item, index));
+                var result = collection.Select(this.CreateItem);
                 return result;
             }
+        }
+
+        public ITableDataRowRenderer NewItem(int index, object defaultModel)
+        {
+            return this.CreateItem((TCollectionItem)defaultModel, index);
+        }
+
+        public ITableDataRowRenderer NewItem(int index)
+        {
+            return this.CreateItem(default(TCollectionItem), index);
         }
 
         public TableDataRowRenderer<TCollectionItem> NewItem(int index, TCollectionItem item)
