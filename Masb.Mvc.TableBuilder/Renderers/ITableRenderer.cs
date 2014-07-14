@@ -2,7 +2,8 @@ using System.Collections.Generic;
 
 namespace Masb.Mvc.TableBuilder
 {
-    public interface ITableRenderer
+    public interface ITableRenderer :
+        IViewTemplate
     {
         TableHeaderRowRenderer Header { get; }
 

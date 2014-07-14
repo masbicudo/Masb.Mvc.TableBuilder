@@ -7,20 +7,22 @@ using System.Web.Mvc;
 namespace Masb.Mvc.TableBuilder
 {
     public class TableRenderer<TModel, TCollectionItem> :
+        IViewTemplate<IList<TCollectionItem>>,
         ITableRenderer
     {
         private readonly ITableTemplate<TModel, TCollectionItem> tableTemplate;
-        private readonly HtmlHelper<TModel> html;
+        private readonly HtmlHelper<TModel> masterHtml;
 
-        public TableRenderer(ITableTemplate<TModel, TCollectionItem> tableTemplate, HtmlHelper<TModel> html)
+        public TableRenderer(ITableTemplate<TModel, TCollectionItem> tableTemplate, HtmlHelper<TModel> masterHtml)
         {
             this.tableTemplate = tableTemplate;
-            this.html = html;
+            this.masterHtml = masterHtml;
+            this.lazyViewTemplate = new Lazy<ViewTemplate<IList<TCollectionItem>>>(this.CreateInnerViewTemplate);
         }
 
         public TableHeaderRowRenderer Header
         {
-            get { return this.tableTemplate.Accept(new TableHeaderRowRendererCreator(this.html)); }
+            get { return this.tableTemplate.Accept(new TableHeaderRowRendererCreator(this.masterHtml)); }
         }
 
         public IEnumerable<ITableDataRowRenderer> Items
@@ -28,7 +30,7 @@ namespace Masb.Mvc.TableBuilder
             get
             {
                 var getter = this.tableTemplate.Expression.Compile();
-                IEnumerable<TCollectionItem> collection = getter(this.html.ViewData.Model);
+                var collection = getter(this.masterHtml.ViewData.Model);
                 var result = collection.Select(this.CreateItem);
                 return result;
             }
@@ -51,10 +53,10 @@ namespace Masb.Mvc.TableBuilder
 
         private TableDataRowRenderer<TCollectionItem> CreateItem(TCollectionItem item, int index)
         {
-            var indexHiddenFieldName = this.html.ViewContext.ViewData.TemplateInfo.GetFullHtmlFieldName(
+            var indexHiddenFieldName = this.masterHtml.ViewContext.ViewData.TemplateInfo.GetFullHtmlFieldName(
                 ExpressionHelper.GetExpressionText(this.tableTemplate.Expression)) + ".Index";
 
-            var indexHiddenElementId = this.html.ViewContext.ViewData.TemplateInfo.GetFullHtmlFieldId(
+            var indexHiddenElementId = this.masterHtml.ViewContext.ViewData.TemplateInfo.GetFullHtmlFieldId(
                 ExpressionHelper.GetExpressionText(this.tableTemplate.Expression)) + "_Index__" + index;
 
             Expression<Func<TModel, TCollectionItem>> indexerLambda;
@@ -79,26 +81,26 @@ namespace Masb.Mvc.TableBuilder
             {
                 TemplateInfo =
                 {
-                    HtmlFieldPrefix = this.html.ViewContext.ViewData.TemplateInfo.GetFullHtmlFieldName(
+                    HtmlFieldPrefix = this.masterHtml.ViewContext.ViewData.TemplateInfo.GetFullHtmlFieldName(
                         ExpressionHelper.GetExpressionText(indexerLambda))
                 },
                 ModelMetadata = ModelMetadata.FromLambdaExpression(
                     indexerLambda,
-                    this.html.ViewData)
+                    this.masterHtml.ViewData)
             };
 
             var viewContext = new ViewContext(
-                this.html.ViewContext,
-                this.html.ViewContext.View,
+                this.masterHtml.ViewContext,
+                this.masterHtml.ViewContext.View,
                 viewData,
-                this.html.ViewContext.TempData,
-                this.html.ViewContext.Writer);
+                this.masterHtml.ViewContext.TempData,
+                this.masterHtml.ViewContext.Writer);
 
             var viewTemplate = new ViewTemplate<TCollectionItem>(viewData, viewContext);
 
             var row = new TableDataRowRenderer<TCollectionItem>(
                 this.tableTemplate.Columns,
-                viewTemplate.Html,
+                viewTemplate,
                 index,
                 indexHiddenFieldName,
                 indexHiddenElementId);
@@ -122,6 +124,101 @@ namespace Masb.Mvc.TableBuilder
                 var result = new TableHeaderRowRenderer(allColumns);
                 return result;
             }
+        }
+
+        private readonly Lazy<ViewTemplate<IList<TCollectionItem>>> lazyViewTemplate;
+
+        public ViewTemplate<IList<TCollectionItem>> CreateInnerViewTemplate()
+        {
+            var getter = this.tableTemplate.Expression.Compile();
+            var collection = getter(this.masterHtml.ViewData.Model);
+            var viewData = new ViewDataDictionary<IList<TCollectionItem>>(collection)
+            {
+                TemplateInfo =
+                {
+                    HtmlFieldPrefix = this.masterHtml.ViewContext.ViewData.TemplateInfo.GetFullHtmlFieldName(
+                        ExpressionHelper.GetExpressionText(this.tableTemplate.Expression))
+                },
+                ModelMetadata = ModelMetadata.FromLambdaExpression(
+                    this.tableTemplate.Expression,
+                    this.masterHtml.ViewData)
+            };
+
+            var viewContext = new ViewContext(
+                this.masterHtml.ViewContext,
+                this.masterHtml.ViewContext.View,
+                viewData,
+                this.masterHtml.ViewContext.TempData,
+                this.masterHtml.ViewContext.Writer);
+
+            var viewTemplate = new ViewTemplate<IList<TCollectionItem>>(viewData, viewContext);
+
+            return viewTemplate;
+        }
+
+        /// <summary>
+        /// Gets the <see cref="T:System.Web.Mvc.AjaxHelper"/> object that is used to render HTML markup using Ajax.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="T:System.Web.Mvc.AjaxHelper"/> object that is used to render HTML markup using Ajax.
+        /// </returns>
+        public AjaxHelper<IList<TCollectionItem>> Ajax
+        {
+            get { return this.lazyViewTemplate.Value.Ajax; }
+        }
+
+        /// <summary>
+        /// Gets the <see cref="T:System.Web.Mvc.HtmlHelper"/> object that is used to render HTML elements.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="T:System.Web.Mvc.HtmlHelper"/> object that is used to render HTML elements.
+        /// </returns>
+        HtmlHelper<IList<TCollectionItem>> IViewTemplate<IList<TCollectionItem>>.Html
+        {
+            get { return this.lazyViewTemplate.Value.Html; }
+        }
+
+        /// <summary>
+        /// Gets the current model object or value.
+        /// </summary>
+        public IList<TCollectionItem> Model
+        {
+            get { return this.lazyViewTemplate.Value.Model; }
+        }
+
+        public ModelMetadata Meta
+        {
+            get { return this.lazyViewTemplate.Value.Meta; }
+        }
+
+        /// <summary>
+        /// Gets the <see cref="T:System.Web.Mvc.UrlHelper"/> of the rendered snippet.
+        /// </summary>
+        public UrlHelper Url
+        {
+            get { return this.lazyViewTemplate.Value.Url; }
+        }
+
+        /// <summary>
+        /// Gets the <see cref="T:System.Web.Mvc.AjaxHelper"/> object that is used to render HTML markup using Ajax.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="T:System.Web.Mvc.AjaxHelper"/> object that is used to render HTML markup using Ajax.
+        /// </returns>
+        AjaxHelper IViewTemplate.Ajax
+        {
+            get { return this.lazyViewTemplate.Value.Ajax; }
+        }
+
+        /// <summary>
+        /// Gets the <see cref="T:System.Web.Mvc.HtmlHelper"/> object that is used to render HTML elements.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="T:System.Web.Mvc.HtmlHelper"/> object that is used to render HTML elements.
+        /// </returns>
+        HtmlHelper IViewTemplate.Html
+        {
+            get { return this.lazyViewTemplate.Value.Html; }
         }
     }
 }

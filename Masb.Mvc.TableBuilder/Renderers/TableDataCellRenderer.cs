@@ -1,74 +1,90 @@
-using System;
 using System.Web.Mvc;
 using System.Web.WebPages;
 
 namespace Masb.Mvc.TableBuilder
 {
-    public class TableDataCellRenderer<TCollectionItem> :
-        ITableDataCellRenderer
+    public class TableDataCellRenderer<TCollectionItem, TSubProperty> :
+        ITableDataCellRenderer,
+        IViewTemplate<TSubProperty>
     {
-        private readonly ITableColumnTemplateFrom<TCollectionItem> tableColumnTemplate;
-        private readonly HtmlHelper<TCollectionItem> html;
+        private readonly ITableColumnTemplate<TCollectionItem, TSubProperty> tableColumnTemplate;
+        private readonly IViewTemplate<TSubProperty> viewTemplate;
 
-        public TableDataCellRenderer(ITableColumnTemplateFrom<TCollectionItem> tableColumnTemplate, HtmlHelper<TCollectionItem> html)
+        public TableDataCellRenderer(ITableColumnTemplate<TCollectionItem, TSubProperty> tableColumnTemplate, IViewTemplate<TSubProperty> viewTemplate)
         {
             this.tableColumnTemplate = tableColumnTemplate;
-            this.html = html;
+            this.viewTemplate = viewTemplate;
         }
 
         public HelperResult Render()
         {
-            var result = this.tableColumnTemplate.Accept(new HelperResultCreator(this.html));
+            var result = this.tableColumnTemplate.GetDataHelperResult(this.viewTemplate);
             return result;
         }
 
-        private class HelperResultCreator :
-            ITableColumnTemplateFromVisitor<TCollectionItem, HelperResult>
+        /// <summary>
+        /// Gets the <see cref="T:System.Web.Mvc.AjaxHelper"/> object that is used to render HTML markup using Ajax.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="T:System.Web.Mvc.AjaxHelper"/> object that is used to render HTML markup using Ajax.
+        /// </returns>
+        public AjaxHelper<TSubProperty> Ajax
         {
-            private readonly HtmlHelper<TCollectionItem> html;
+            get { return this.viewTemplate.Ajax; }
+        }
 
-            public HelperResultCreator(HtmlHelper<TCollectionItem> html)
-            {
-                this.html = html;
-            }
+        /// <summary>
+        /// Gets the <see cref="T:System.Web.Mvc.HtmlHelper"/> object that is used to render HTML elements.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="T:System.Web.Mvc.HtmlHelper"/> object that is used to render HTML elements.
+        /// </returns>
+        HtmlHelper<TSubProperty> IViewTemplate<TSubProperty>.Html
+        {
+            get { return this.viewTemplate.Html; }
+        }
 
-            public HelperResult Visit<TSubProperty>(ITableColumnTemplate<TCollectionItem, TSubProperty> value)
-            {
-                var rootModel = this.html.ViewData.Model;
-                var modelGetter = value.Expression.Compile();
-                TSubProperty model = default(TSubProperty);
-                try
-                {
-                    model = modelGetter(rootModel);
-                }
-                catch (NullReferenceException ex)
-                {
-                }
+        /// <summary>
+        /// Gets the current model object or value.
+        /// </summary>
+        public TSubProperty Model
+        {
+            get { return this.viewTemplate.Model; }
+        }
 
-                var viewData = new ViewDataDictionary<TSubProperty>(model)
-                {
-                    TemplateInfo =
-                    {
-                        HtmlFieldPrefix = this.html.ViewContext.ViewData.TemplateInfo.GetFullHtmlFieldName(
-                            ExpressionHelper.GetExpressionText(value.Expression))
-                    },
-                    ModelMetadata = ModelMetadata.FromLambdaExpression(
-                        value.Expression,
-                        this.html.ViewData)
-                };
+        public ModelMetadata Meta
+        {
+            get { return this.viewTemplate.Meta; }
+        }
 
-                var viewContext = new ViewContext(
-                    this.html.ViewContext,
-                    this.html.ViewContext.View,
-                    viewData,
-                    this.html.ViewContext.TempData,
-                    this.html.ViewContext.Writer);
+        /// <summary>
+        /// Gets the <see cref="T:System.Web.Mvc.UrlHelper"/> of the rendered snippet.
+        /// </summary>
+        public UrlHelper Url
+        {
+            get { return this.viewTemplate.Url; }
+        }
 
-                var viewTemplate = new ViewTemplate<TSubProperty>(viewData, viewContext);
+        /// <summary>
+        /// Gets the <see cref="T:System.Web.Mvc.AjaxHelper"/> object that is used to render HTML markup using Ajax.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="T:System.Web.Mvc.AjaxHelper"/> object that is used to render HTML markup using Ajax.
+        /// </returns>
+        AjaxHelper IViewTemplate.Ajax
+        {
+            get { return this.viewTemplate.Ajax; }
+        }
 
-                var result = value.GetDataHelperResult(viewTemplate);
-                return result;
-            }
+        /// <summary>
+        /// Gets the <see cref="T:System.Web.Mvc.HtmlHelper"/> object that is used to render HTML elements.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="T:System.Web.Mvc.HtmlHelper"/> object that is used to render HTML elements.
+        /// </returns>
+        HtmlHelper IViewTemplate.Html
+        {
+            get { return this.viewTemplate.Html; }
         }
     }
 }

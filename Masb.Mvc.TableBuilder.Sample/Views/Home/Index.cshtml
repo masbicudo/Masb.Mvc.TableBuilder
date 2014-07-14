@@ -18,9 +18,10 @@
         ;
 }
 @{
-    var table = this.Html.Table(tableTemplate);
-    <table>
+    var table = this.Html.Table(tableTemplate) as ITableRenderer;
+    <table id="@table.Html.ViewData.TemplateInfo.GetFullHtmlFieldId("Table")">
         @{
+            var allItems = table.Items.Select(item => item.Html.ViewData.Model).ToArray();
             var header = table.Header;
             <thead>
                 <tr>
@@ -36,11 +37,11 @@
         <tbody>
             @foreach (var item in table.Items)
             {
-                <tr>
+                <tr id="@item.Html.ViewData.TemplateInfo.GetFullHtmlFieldId("Row")">
                     @item.RenderIndexHiddenField()
                     @foreach (var itemColumn in item.Cells)
                     {
-                        <td>
+                        <td id="@itemColumn.Html.ViewData.TemplateInfo.GetFullHtmlFieldId("Cell")">
                             @itemColumn.Render()
                         </td>
                     }
