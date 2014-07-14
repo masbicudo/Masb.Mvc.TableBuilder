@@ -1,7 +1,7 @@
 using System;
 using System.Linq.Expressions;
 
-namespace Masb.Mvc.TableBuilder.Code
+namespace Masb.Mvc.TableBuilder
 {
     public interface ITableColumnTemplate
     {

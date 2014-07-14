@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Web.Mvc;
+using Masb.Mvc.TableBuilder;
 
-namespace Masb.Mvc.TableBuilder.Code
+namespace Masb.Mvc.TableBuilder
 {
     public class TableDataRowRenderer<TCollectionItem>
     {

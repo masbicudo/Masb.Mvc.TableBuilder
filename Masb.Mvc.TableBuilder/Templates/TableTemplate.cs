@@ -4,7 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq.Expressions;
 using System.Web.WebPages;
 
-namespace Masb.Mvc.TableBuilder.Code
+namespace Masb.Mvc.TableBuilder
 {
     public class TableTemplate<TModel, TCollectionItem> :
         ITableTemplate<TModel, TCollectionItem>
@@ -19,12 +19,20 @@ namespace Masb.Mvc.TableBuilder.Code
             this.collectionExpression = collectionExpression;
         }
 
-        public TableTemplate<TModel, TCollectionItem> AddColumn<TSubProperty>(
+        public TableTemplate<TModel, TCollectionItem> AddColumnFor<TSubProperty>(
             Expression<Func<TCollectionItem, TSubProperty>> subPropertyExpression,
             Func<IViewTemplate, HelperResult> header,
             Func<IViewTemplate<TSubProperty>, HelperResult> content)
         {
             this.columns.Add(new TableColumnTemplate<TCollectionItem, TSubProperty>(subPropertyExpression, header, content));
+            return this;
+        }
+
+        public TableTemplate<TModel, TCollectionItem> AddColumn(
+            Func<IViewTemplate, HelperResult> header,
+            Func<IViewTemplate<TCollectionItem>, HelperResult> content)
+        {
+            this.columns.Add(new TableColumnTemplate<TCollectionItem, TCollectionItem>(x => x, header, content));
             return this;
         }
 

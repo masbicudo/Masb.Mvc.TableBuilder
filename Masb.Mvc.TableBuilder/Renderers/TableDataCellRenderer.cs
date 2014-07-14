@@ -1,7 +1,8 @@
 using System.Web.Mvc;
 using System.Web.WebPages;
+using Masb.Mvc.TableBuilder;
 
-namespace Masb.Mvc.TableBuilder.Code
+namespace Masb.Mvc.TableBuilder
 {
     public class TableDataCellRenderer<TCollectionItem>
     {

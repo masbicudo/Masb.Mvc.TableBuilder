@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Web.Mvc;
 
-namespace Masb.Mvc.TableBuilder.Code
+namespace Masb.Mvc.TableBuilder
 {
     /// <summary>
     /// Represents the `item` object that is passed to inline helpers.
@@ -59,5 +59,10 @@ namespace Masb.Mvc.TableBuilder.Code
         /// The <see cref="T:System.Web.Mvc.HtmlHelper"/> object that is used to render HTML elements.
         /// </returns>
         new HtmlHelper<TModel> Html { get; }
+
+        /// <summary>
+        /// Gets the current model object or value.
+        /// </summary>
+        TModel Model { get; }
     }
 }

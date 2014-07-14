@@ -1,4 +1,4 @@
-namespace Masb.Mvc.TableBuilder.Code
+namespace Masb.Mvc.TableBuilder
 {
     public interface ITableColumnTemplateVisitor<out TResult>
     {

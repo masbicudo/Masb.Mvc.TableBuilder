@@ -1,6 +1,6 @@
 ﻿using System.Web.Mvc;
 
-namespace Masb.Mvc.TableBuilder.Code
+namespace Masb.Mvc.TableBuilder
 {
     public class ViewTemplate<TModel> :
         IViewTemplate<TModel>,
@@ -48,6 +48,14 @@ namespace Masb.Mvc.TableBuilder.Code
         /// The <see cref="T:System.Web.Mvc.HtmlHelper"/> object that is used to render HTML elements.
         /// </returns>
         public HtmlHelper<TModel> Html { get; private set; }
+
+        /// <summary>
+        /// Gets the current model object or value.
+        /// </summary>
+        public TModel Model
+        {
+            get { return this.Html.ViewData.Model; }
+        }
 
         /// <summary>
         /// Gets the <see cref="T:System.Web.Mvc.HtmlHelper"/> object that is used to render HTML elements.

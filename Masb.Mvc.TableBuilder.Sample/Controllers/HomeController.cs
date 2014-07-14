@@ -19,12 +19,16 @@ namespace Masb.Mvc.TableBuilder.Sample.Controllers
                                             new RowViewModel
                                             {
                                                 PersonName = "Miguel Angelo",
-                                                BirthDate = new DateTime(1984, 05, 04)
+                                                BirthDate = new DateTime(1984, 05, 04),
+                                                Gender = GenderKinds.Male,
+                                                MaleProp = "Male prop"
                                             },
                                             new RowViewModel
                                             {
                                                 PersonName = "Maria Luiza",
-                                                BirthDate = new DateTime(1986, 09, 27)
+                                                BirthDate = new DateTime(1986, 09, 27),
+                                                Gender = GenderKinds.Female,
+                                                FemaleProp = "Female prop"
                                             },
                                         }
                              });

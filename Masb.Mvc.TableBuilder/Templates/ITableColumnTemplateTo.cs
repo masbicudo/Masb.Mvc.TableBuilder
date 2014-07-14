@@ -1,6 +1,6 @@
 using System.Web.WebPages;
 
-namespace Masb.Mvc.TableBuilder.Code
+namespace Masb.Mvc.TableBuilder
 {
     public interface ITableColumnTemplateTo<TSubProperty> :
         ITableColumnTemplate
