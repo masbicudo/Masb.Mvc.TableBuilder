@@ -21,7 +21,7 @@ namespace Masb.Mvc.TableBuilder.Code
             this HtmlHelper<TModel> html,
             ITableTemplate<TModel, TCollectionItem> tableTemplate)
         {
-            return new TableRenderer<TModel, TCollectionItem>(tableTemplate, html.ViewData.Model, html);
+            return new TableRenderer<TModel, TCollectionItem>(tableTemplate, html);
         }
     }
 
@@ -216,19 +216,17 @@ namespace Masb.Mvc.TableBuilder.Code
     public class TableRenderer<TModel, TCollectionItem>
     {
         private readonly ITableTemplate<TModel, TCollectionItem> tableTemplate;
-        private readonly TModel model;
         private readonly HtmlHelper<TModel> html;
 
-        public TableRenderer(ITableTemplate<TModel, TCollectionItem> tableTemplate, TModel model, HtmlHelper<TModel> html)
+        public TableRenderer(ITableTemplate<TModel, TCollectionItem> tableTemplate, HtmlHelper<TModel> html)
         {
             this.tableTemplate = tableTemplate;
-            this.model = model;
             this.html = html;
         }
 
         public TableHeaderRowRenderer Header
         {
-            get { return this.tableTemplate.Accept(new TableHeaderRowRendererCreator(this.model, this.html)); }
+            get { return this.tableTemplate.Accept(new TableHeaderRowRendererCreator(this.html)); }
         }
 
         public IEnumerable<TableDataRowRenderer<TCollectionItem>> Items
@@ -236,15 +234,13 @@ namespace Masb.Mvc.TableBuilder.Code
             get
             {
                 var getter = this.tableTemplate.Expression.Compile();
-                IEnumerable<TCollectionItem> collection = getter(this.model);
+                IEnumerable<TCollectionItem> collection = getter(this.html.ViewData.Model);
 
                 var result = collection.Select(
-                    (x, i) =>
+                    (item, i) =>
                     {
-                        var viewContext = new ViewContext();
-
-                        var expr = this.tableTemplate.Expression;
-                        var lambda = expr as LambdaExpression;
+                        var expression = this.tableTemplate.Expression;
+                        var lambda = expression as LambdaExpression;
                         var body = lambda.Body;
                         if (body.NodeType == ExpressionType.Convert)
                             body = ((UnaryExpression)body).Operand;
@@ -257,16 +253,30 @@ namespace Masb.Mvc.TableBuilder.Code
                             new[] { Expression.Constant(i) });
                         var indexerLambda = Expression.Lambda<Func<TModel, TCollectionItem>>(indexer, lambda.Parameters);
 
-                        var viewDataDictionary = new ViewDataDictionary<TCollectionItem>();
-                        viewDataDictionary.ModelMetadata = ModelMetadata.FromLambdaExpression(
+                        var viewData = new ViewDataDictionary<TCollectionItem>(item);
+                        viewData.TemplateInfo.HtmlFieldPrefix =
+                            this.html.ViewContext.ViewData.TemplateInfo.GetFullHtmlFieldName(
+                                ExpressionHelper.GetExpressionText((LambdaExpression)indexerLambda));
+                        viewData.ModelMetadata = ModelMetadata.FromLambdaExpression(
                             indexerLambda,
                             this.html.ViewData);
 
-                        var viewTemplate = new ViewTemplate<TCollectionItem>();
-                        viewTemplate.ViewData = viewDataDictionary;
-                        viewTemplate.Meta = viewDataDictionary.ModelMetadata;
+                        var viewTemplate = new ViewTemplate<TCollectionItem>
+                        {
+                            ViewData = viewData,
+                            Meta = viewData.ModelMetadata
+                        };
+
+                        var viewContext = new ViewContext(
+                            this.html.ViewContext,
+                            this.html.ViewContext.View,
+                            viewData,
+                            this.html.ViewContext.TempData,
+                            this.html.ViewContext.Writer);
+
                         var html2 = new HtmlHelper<TCollectionItem>(viewContext, viewTemplate);
-                        var row = new TableDataRowRenderer<TCollectionItem>(x, this.tableTemplate.Columns, html2);
+
+                        var row = new TableDataRowRenderer<TCollectionItem>(this.tableTemplate.Columns, html2);
                         return row;
                     });
                 return result;
@@ -290,12 +300,10 @@ namespace Masb.Mvc.TableBuilder.Code
 
         class TableHeaderRowRendererCreator : ITableTemplateVisitor<TModel, TableHeaderRowRenderer>
         {
-            private readonly TModel model;
             private readonly HtmlHelper html;
 
-            public TableHeaderRowRendererCreator(TModel model, HtmlHelper html)
+            public TableHeaderRowRendererCreator(HtmlHelper html)
             {
-                this.model = model;
                 this.html = html;
             }
 
@@ -351,17 +359,27 @@ namespace Masb.Mvc.TableBuilder.Code
 
             public HelperResult Visit<TCollectionItem, TSubProperty>(ITableColumnTemplate<TCollectionItem, TSubProperty> value)
             {
-                var viewDataDictionary = new ViewDataDictionary<TSubProperty>();
-
-                viewDataDictionary.ModelMetadata = ModelMetadata.FromLambdaExpression(
+                var viewData = new ViewDataDictionary<TSubProperty>();
+                viewData.TemplateInfo.HtmlFieldPrefix =
+                    this.html.ViewContext.ViewData.TemplateInfo.GetFullHtmlFieldName(
+                        ExpressionHelper.GetExpressionText((LambdaExpression)value.Expression));
+                viewData.ModelMetadata = ModelMetadata.FromLambdaExpression(
                     value.Expression,
                     new ViewDataDictionary<TCollectionItem>());
 
-                var viewContext = new ViewContext();
                 var viewTemplate = new ViewTemplate<TSubProperty>();
-                viewTemplate.ViewData = viewDataDictionary;
-                viewTemplate.Meta = viewDataDictionary.ModelMetadata;
+                viewTemplate.ViewData = viewData;
+                viewTemplate.Meta = viewData.ModelMetadata;
+
+                var viewContext = new ViewContext(
+                    this.html.ViewContext,
+                    this.html.ViewContext.View,
+                    viewData,
+                    this.html.ViewContext.TempData,
+                    this.html.ViewContext.Writer);
+
                 viewTemplate.Html = new HtmlHelper<TSubProperty>(viewContext, viewTemplate);
+
                 var result = value.GetHeaderHelperResult(viewTemplate);
                 return result;
             }
@@ -371,13 +389,11 @@ namespace Masb.Mvc.TableBuilder.Code
     public class TableDataRowRenderer<TCollectionItem> :
         ITableDataRenderer<TCollectionItem>
     {
-        private readonly TCollectionItem model;
         private readonly IEnumerable<ITableColumnTemplateFrom<TCollectionItem>> columns;
         private readonly HtmlHelper<TCollectionItem> html;
 
-        public TableDataRowRenderer(TCollectionItem model, IEnumerable<ITableColumnTemplateFrom<TCollectionItem>> columns, HtmlHelper<TCollectionItem> html)
+        public TableDataRowRenderer(IEnumerable<ITableColumnTemplateFrom<TCollectionItem>> columns, HtmlHelper<TCollectionItem> html)
         {
-            this.model = model;
             this.columns = columns;
             this.html = html;
         }
@@ -386,7 +402,7 @@ namespace Masb.Mvc.TableBuilder.Code
         {
             get
             {
-                var result = this.columns.Select(x => new TableDataCellRenderer<TCollectionItem>(this.model, x, this.html));
+                var result = this.columns.Select(col => new TableDataCellRenderer<TCollectionItem>(col, this.html));
                 return result;
             }
         }
@@ -403,50 +419,55 @@ namespace Masb.Mvc.TableBuilder.Code
 
     public class TableDataCellRenderer<TCollectionItem>
     {
-        private readonly TCollectionItem item;
         private readonly ITableColumnTemplateFrom<TCollectionItem> tableColumnTemplate;
         private readonly HtmlHelper<TCollectionItem> html;
 
-        public TableDataCellRenderer(TCollectionItem item, ITableColumnTemplateFrom<TCollectionItem> tableColumnTemplate, HtmlHelper<TCollectionItem> html)
+        public TableDataCellRenderer(ITableColumnTemplateFrom<TCollectionItem> tableColumnTemplate, HtmlHelper<TCollectionItem> html)
         {
-            this.item = item;
             this.tableColumnTemplate = tableColumnTemplate;
             this.html = html;
         }
 
         public HelperResult Render()
         {
-            var result = this.tableColumnTemplate.Accept(new HelperResultCreator(this.html, this.item));
+            var result = this.tableColumnTemplate.Accept(new HelperResultCreator(this.html));
             return result;
         }
 
         class HelperResultCreator : ITableColumnTemplateFromVisitor<TCollectionItem, HelperResult>
         {
             private readonly HtmlHelper<TCollectionItem> html;
-            private readonly TCollectionItem item;
 
-            public HelperResultCreator(HtmlHelper<TCollectionItem> html, TCollectionItem item)
+            public HelperResultCreator(HtmlHelper<TCollectionItem> html)
             {
                 this.html = html;
-                this.item = item;
             }
 
             public HelperResult Visit<TSubProperty>(ITableColumnTemplate<TCollectionItem, TSubProperty> value)
             {
-                var model = value.Expression.Compile()(this.item);
+                var model = value.Expression.Compile()(this.html.ViewData.Model);
 
-                var viewDataDictionary = new ViewDataDictionary<TSubProperty>(model);
-                viewDataDictionary.ModelMetadata = ModelMetadata.FromLambdaExpression(
+                var viewData = new ViewDataDictionary<TSubProperty>(model);
+                viewData.TemplateInfo.HtmlFieldPrefix =
+                    this.html.ViewContext.ViewData.TemplateInfo.GetFullHtmlFieldName(
+                        ExpressionHelper.GetExpressionText((LambdaExpression)value.Expression));
+                viewData.ModelMetadata = ModelMetadata.FromLambdaExpression(
                     value.Expression,
                     this.html.ViewData);
 
-                var viewContext = new ViewContext();
-
                 var viewTemplate = new ViewTemplate<TSubProperty>
                                    {
-                                       ViewData = viewDataDictionary,
-                                       Meta = viewDataDictionary.ModelMetadata
+                                       ViewData = viewData,
+                                       Meta = viewData.ModelMetadata
                                    };
+
+                var viewContext = new ViewContext(
+                    this.html.ViewContext,
+                    this.html.ViewContext.View,
+                    viewData,
+                    this.html.ViewContext.TempData,
+                    this.html.ViewContext.Writer);
+
                 viewTemplate.Html = new HtmlHelper<TSubProperty>(viewContext, viewTemplate);
 
                 var result = value.GetDataHelperResult(viewTemplate);
