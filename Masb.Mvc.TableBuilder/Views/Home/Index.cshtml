@@ -9,7 +9,8 @@
 @{
     var tableTemplate = this.Html.TableTemplateFor(m => m.Rows)
         .AddColumn(m => m.PersonName, @<div>@item.Meta.GetDisplayName()</div>, @<div>@item.Html.EditorFor(m => m)</div>)
-        .AddColumn(m => m.BirthData, @<div>@item.Meta.GetDisplayName()</div>, @<div>@item.Html.EditorFor(m => m)</div>)
+        .AddColumn(m => m.BirthDate, @<div>@item.Meta.GetDisplayName()</div>, @<div>@item.Html.EditorFor(m => m)</div>)
+        .AddColumn(m => m.Age, @<div>@item.Meta.GetDisplayName()</div>, @<div>@item.Html.EditorFor(m => m)</div>)
         ;
 }
 @{

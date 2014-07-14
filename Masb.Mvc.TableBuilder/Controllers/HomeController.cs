@@ -19,12 +19,12 @@ namespace Masb.Mvc.TableBuilder.Controllers
                                             new RowViewModel
                                             {
                                                 PersonName = "Miguel Angelo",
-                                                BirthData = new DateTime(1984, 05, 04)
+                                                BirthDate = new DateTime(1984, 05, 04)
                                             },
                                             new RowViewModel
                                             {
                                                 PersonName = "Maria Luiza",
-                                                BirthData = new DateTime(1986, 09, 27)
+                                                BirthDate = new DateTime(1986, 09, 27)
                                             },
                                         }
                              });

@@ -110,7 +110,26 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Code\Class1.cs" />
+    <Compile Include="Code\HtmlHelperExtensions.cs" />
+    <Compile Include="Code\Templates\ITableColumnTemplate.cs" />
+    <Compile Include="Code\Templates\ITableColumnTemplateFrom.cs" />
+    <Compile Include="Code\Templates\ITableColumnTemplateFromVisitor.cs" />
+    <Compile Include="Code\Templates\ITableColumnTemplateTo.cs" />
+    <Compile Include="Code\Templates\ITableColumnTemplateToVisitor.cs" />
+    <Compile Include="Code\Templates\ITableColumnTemplateVisitor.cs" />
+    <Compile Include="Code\Templates\ITableTemplate.cs" />
+    <Compile Include="Code\Templates\ITableTemplateTo.cs" />
+    <Compile Include="Code\Templates\ITableTemplateToVisitor.cs" />
+    <Compile Include="Code\Templates\ITableTemplateVisitor.cs" />
+    <Compile Include="Code\IViewTemplate.cs" />
+    <Compile Include="Code\Templates\TableColumnTemplate.cs" />
+    <Compile Include="Code\Renderers\TableDataCellRenderer.cs" />
+    <Compile Include="Code\Renderers\TableDataRowRenderer.cs" />
+    <Compile Include="Code\Renderers\TableHeaderCellRenderer.cs" />
+    <Compile Include="Code\Renderers\TableHeaderRowRenderer.cs" />
+    <Compile Include="Code\Renderers\TableRenderer.cs" />
+    <Compile Include="Code\Templates\TableTemplate.cs" />
+    <Compile Include="Code\ViewTemplate.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
