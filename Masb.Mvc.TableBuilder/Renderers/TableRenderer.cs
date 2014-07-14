@@ -6,7 +6,8 @@ using System.Web.Mvc;
 
 namespace Masb.Mvc.TableBuilder
 {
-    public class TableRenderer<TModel, TCollectionItem>
+    public class TableRenderer<TModel, TCollectionItem> :
+        ITableRenderer
     {
         private readonly ITableTemplate<TModel, TCollectionItem> tableTemplate;
         private readonly HtmlHelper<TModel> html;
@@ -22,7 +23,7 @@ namespace Masb.Mvc.TableBuilder
             get { return this.tableTemplate.Accept(new TableHeaderRowRendererCreator(this.html)); }
         }
 
-        public IEnumerable<TableDataRowRenderer<TCollectionItem>> Items
+        public IEnumerable<ITableDataRowRenderer> Items
         {
             get
             {
@@ -45,7 +46,7 @@ namespace Masb.Mvc.TableBuilder
                                 // TODO: the indexer is not always named "Item"
                                 "get_Item",
                                 new Type[0],
-                                new[] { Expression.Constant(i) });
+                                new Expression[] { Expression.Constant(i) });
 
                             indexerLambda = Expression.Lambda<Func<TModel, TCollectionItem>>(indexer, lambda.Parameters);
                         }
@@ -55,7 +56,7 @@ namespace Masb.Mvc.TableBuilder
                             TemplateInfo =
                             {
                                 HtmlFieldPrefix = this.html.ViewContext.ViewData.TemplateInfo.GetFullHtmlFieldName(
-                                    ExpressionHelper.GetExpressionText((LambdaExpression)indexerLambda))
+                                    ExpressionHelper.GetExpressionText(indexerLambda))
                             },
                             ModelMetadata = ModelMetadata.FromLambdaExpression(
                                 indexerLambda,
@@ -78,7 +79,8 @@ namespace Masb.Mvc.TableBuilder
             }
         }
 
-        private class TableHeaderRowRendererCreator : ITableTemplateVisitor<TModel, TableHeaderRowRenderer>
+        private class TableHeaderRowRendererCreator :
+            ITableTemplateVisitor<TModel, TableHeaderRowRenderer>
         {
             private readonly HtmlHelper html;
 

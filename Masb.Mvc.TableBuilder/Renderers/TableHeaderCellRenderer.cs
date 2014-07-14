@@ -1,7 +1,5 @@
-using System.Linq.Expressions;
 using System.Web.Mvc;
 using System.Web.WebPages;
-using Masb.Mvc.TableBuilder;
 
 namespace Masb.Mvc.TableBuilder
 {
@@ -38,7 +36,7 @@ namespace Masb.Mvc.TableBuilder
                     TemplateInfo =
                     {
                         HtmlFieldPrefix = this.html.ViewContext.ViewData.TemplateInfo.GetFullHtmlFieldName(
-                            ExpressionHelper.GetExpressionText((LambdaExpression)value.Expression))
+                            ExpressionHelper.GetExpressionText(value.Expression))
                     },
                     ModelMetadata = ModelMetadata.FromLambdaExpression(
                         value.Expression,

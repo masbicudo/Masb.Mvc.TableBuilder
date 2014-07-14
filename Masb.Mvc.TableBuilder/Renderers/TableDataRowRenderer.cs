@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Web.Mvc;
-using Masb.Mvc.TableBuilder;
 
 namespace Masb.Mvc.TableBuilder
 {
-    public class TableDataRowRenderer<TCollectionItem>
+    public class TableDataRowRenderer<TCollectionItem> :
+        ITableDataRowRenderer
     {
         private readonly IEnumerable<ITableColumnTemplateFrom<TCollectionItem>> columns;
         private readonly HtmlHelper<TCollectionItem> html;
@@ -16,7 +16,7 @@ namespace Masb.Mvc.TableBuilder
             this.html = html;
         }
 
-        public IEnumerable<TableDataCellRenderer<TCollectionItem>> Cells
+        public IEnumerable<ITableDataCellRenderer> Cells
         {
             get
             {

@@ -1,10 +1,10 @@
 using System.Web.Mvc;
 using System.Web.WebPages;
-using Masb.Mvc.TableBuilder;
 
 namespace Masb.Mvc.TableBuilder
 {
-    public class TableDataCellRenderer<TCollectionItem>
+    public class TableDataCellRenderer<TCollectionItem> :
+        ITableDataCellRenderer
     {
         private readonly ITableColumnTemplateFrom<TCollectionItem> tableColumnTemplate;
         private readonly HtmlHelper<TCollectionItem> html;
@@ -21,7 +21,8 @@ namespace Masb.Mvc.TableBuilder
             return result;
         }
 
-        class HelperResultCreator : ITableColumnTemplateFromVisitor<TCollectionItem, HelperResult>
+        private class HelperResultCreator :
+            ITableColumnTemplateFromVisitor<TCollectionItem, HelperResult>
         {
             private readonly HtmlHelper<TCollectionItem> html;
 
