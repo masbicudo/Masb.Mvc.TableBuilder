@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Masb.Mvc.TableBuilder.Models
+namespace Masb.Mvc.TableBuilder.Sample.Models
 {
     public class RowViewModel
     {

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Web.Mvc;
-using Masb.Mvc.TableBuilder.Models;
+using Masb.Mvc.TableBuilder.Sample.Models;
 
-namespace Masb.Mvc.TableBuilder.Controllers
+namespace Masb.Mvc.TableBuilder.Sample.Controllers
 {
     public class HomeController : Controller
     {

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Masb.Mvc.TableBuilder", "Masb.Mvc.TableBuilder\Masb.Mvc.TableBuilder.csproj", "{1D7504C2-D50D-4EDB-8D51-F8583F9EDF65}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Masb.Mvc.TableBuilder.Sample", "Masb.Mvc.TableBuilder.Sample\Masb.Mvc.TableBuilder.Sample.csproj", "{1D7504C2-D50D-4EDB-8D51-F8583F9EDF65}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{6B54D461-53A4-46F0-A054-20894A598018}"
 	ProjectSection(SolutionItems) = preProject
@@ -9,6 +9,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{6B54D4
 		.nuget\NuGet.exe = .nuget\NuGet.exe
 		.nuget\NuGet.targets = .nuget\NuGet.targets
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Masb.Mvc.TableBuilder", "Masb.Mvc.TableBuilder\Masb.Mvc.TableBuilder.csproj", "{010B8C9F-56D4-4B6B-997D-B790C792EE27}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -20,6 +22,10 @@ Global
 		{1D7504C2-D50D-4EDB-8D51-F8583F9EDF65}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1D7504C2-D50D-4EDB-8D51-F8583F9EDF65}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1D7504C2-D50D-4EDB-8D51-F8583F9EDF65}.Release|Any CPU.Build.0 = Release|Any CPU
+		{010B8C9F-56D4-4B6B-997D-B790C792EE27}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{010B8C9F-56D4-4B6B-997D-B790C792EE27}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{010B8C9F-56D4-4B6B-997D-B790C792EE27}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{010B8C9F-56D4-4B6B-997D-B790C792EE27}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

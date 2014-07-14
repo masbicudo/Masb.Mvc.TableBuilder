@@ -1,7 +1,6 @@
-﻿using System.Web;
-using System.Web.Mvc;
+﻿using System.Web.Mvc;
 
-namespace Masb.Mvc.TableBuilder
+namespace Masb.Mvc.TableBuilder.Sample
 {
     public class FilterConfig
     {

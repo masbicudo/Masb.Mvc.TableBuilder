@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <authors>$author$</authors>
+    <owners>$author$</owners>
+    <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0.html</licenseUrl>
+    <projectUrl>https://github.com/masbicudo/Masb.Mvc.TableBuilder</projectUrl>
+    <iconUrl>https://raw.githubusercontent.com/masbicudo/Masb.Mvc.TableBuilder/master/Masb.Mvc.TableBuilder/icon-256.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>$description$</description>
+    <releaseNotes>
+        Package containing `TableTemplateFor` and `Table` extension methods.
+        TableTemplateFor is used to create a table template.
+        Table is used in the rendering process, by using a previously created template.
+    </releaseNotes>
+    <copyright>Copyright Miguel Angelo 2014</copyright>
+    <tags>
+        TableTemplateFor Table Builder Template Masb
+    </tags>
+  </metadata>
+</package>
