@@ -29,7 +29,7 @@ namespace Masb.Mvc.TableBuilder
             {
                 var getter = this.tableTemplate.Expression.Compile();
                 IEnumerable<TCollectionItem> collection = getter(this.html.ViewData.Model);
-                var result = collection.Select(this.CreateItem);
+                var result = collection.Select((item, index) => this.CreateItem(item, index));
                 return result;
             }
         }
@@ -41,6 +41,12 @@ namespace Masb.Mvc.TableBuilder
 
         private TableDataRowRenderer<TCollectionItem> CreateItem(TCollectionItem item, int index)
         {
+            var indexHiddenFieldName = this.html.ViewContext.ViewData.TemplateInfo.GetFullHtmlFieldName(
+                ExpressionHelper.GetExpressionText(this.tableTemplate.Expression)) + ".Index";
+
+            var indexHiddenElementId = this.html.ViewContext.ViewData.TemplateInfo.GetFullHtmlFieldId(
+                ExpressionHelper.GetExpressionText(this.tableTemplate.Expression)) + "_Index__" + index;
+
             Expression<Func<TModel, TCollectionItem>> indexerLambda;
             {
                 var expression = this.tableTemplate.Expression;
@@ -80,7 +86,13 @@ namespace Masb.Mvc.TableBuilder
 
             var viewTemplate = new ViewTemplate<TCollectionItem>(viewData, viewContext);
 
-            var row = new TableDataRowRenderer<TCollectionItem>(this.tableTemplate.Columns, viewTemplate.Html);
+            var row = new TableDataRowRenderer<TCollectionItem>(
+                this.tableTemplate.Columns,
+                viewTemplate.Html,
+                index,
+                indexHiddenFieldName,
+                indexHiddenElementId);
+
             return row;
         }
 

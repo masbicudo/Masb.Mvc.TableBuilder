@@ -37,6 +37,7 @@
             @foreach (var item in table.Items)
             {
                 <tr>
+                    @item.RenderIndexHiddenField()
                     @foreach (var itemColumn in item.Cells)
                     {
                         <td>
@@ -47,6 +48,7 @@
             }
             <tr>
                 @{ var newItem = table.NewItem(int.MaxValue, null); }
+                @newItem.RenderIndexHiddenField()
                 @foreach (var itemColumn in newItem.Cells)
                 {
                     <td>
