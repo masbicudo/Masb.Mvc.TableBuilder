@@ -29,6 +29,9 @@ namespace Masb.Mvc.TableBuilder
             this.indexHiddenElementId = indexHiddenElementId;
         }
 
+        /// <summary>
+        /// Gets the cells that compose this data row.
+        /// </summary>
         public IEnumerable<ITableDataCellRenderer> Cells
         {
             get
@@ -88,23 +91,34 @@ namespace Masb.Mvc.TableBuilder
             }
         }
 
+        /// <summary>
+        /// Renders the hidden field responsible for indicating the existence of this index inside the collection,
+        /// through the ".Index" property.
+        /// </summary>
+        /// <returns>An <see cref="MvcHtmlString"/> with the hidden field to render.</returns>
         public MvcHtmlString RenderIndexHiddenField()
         {
             return
                 new MvcHtmlString(
                     string.Format(
-                        @"<input type=""hidden"" id=""{0}"" name=""{1}"" value""{2}"" />",
+                        @"<input type=""hidden"" id=""{0}"" name=""{1}"" value=""{2}"" />",
                         this.indexHiddenElementId,
                         this.indexHiddenFieldName,
                         this.indexToRender));
         }
 
+        /// <summary>
+        /// Renders the hidden field responsible for indicating the existence of this index inside the collection,
+        /// through the ".Index" property.
+        /// </summary>
+        /// <param name="class"> The CSS class name that will be rendered for the hidden input field. </param>
+        /// <returns> An <see cref="MvcHtmlString"/> with the hidden field to render. </returns>
         public MvcHtmlString RenderIndexHiddenField(string @class)
         {
             return
                 new MvcHtmlString(
                     string.Format(
-                        @"<input type=""hidden"" id=""{0}"" name=""{1}"" value""{2}"" class=""{3}"" />",
+                        @"<input type=""hidden"" id=""{0}"" name=""{1}"" value=""{2}"" class=""{3}"" />",
                         this.indexHiddenElementId,
                         this.indexHiddenFieldName,
                         this.indexToRender,

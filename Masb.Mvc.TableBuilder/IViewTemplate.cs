@@ -10,6 +10,9 @@ namespace Masb.Mvc.TableBuilder
     /// </summary>
     public interface IViewTemplate
     {
+        /// <summary>
+        /// Gets the <see cref="ModelMetadata"/> associated with this view template.
+        /// </summary>
         ModelMetadata Meta { get; }
 
         /// <summary>
