@@ -1,8 +1,9 @@
 using System.Web.WebPages;
+using JetBrains.Annotations;
 
 namespace Masb.Mvc.TableBuilder
 {
-    public interface ITableDataCellRenderer :
+    public interface ITableHeaderCellRenderer :
         IViewTemplate,
         ISectionRenderer
     {

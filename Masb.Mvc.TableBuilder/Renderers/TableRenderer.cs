@@ -4,6 +4,8 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Web.Mvc;
+using System.Web.WebPages;
+using JetBrains.Annotations;
 
 namespace Masb.Mvc.TableBuilder
 {
@@ -31,7 +33,15 @@ namespace Masb.Mvc.TableBuilder
             get
             {
                 var getter = this.tableTemplate.Expression.Compile();
+
+                if (this.masterHtml.ViewData.Model == null)
+                    return Enumerable.Empty<ITableDataRowRenderer>();
+
                 var collection = getter(this.masterHtml.ViewData.Model);
+
+                if (collection == null)
+                    return Enumerable.Empty<ITableDataRowRenderer>();
+
                 var result = collection.Select(this.CreateItem);
                 return result;
             }
@@ -45,6 +55,46 @@ namespace Masb.Mvc.TableBuilder
         public ITableDataRowRenderer NewItem(int index)
         {
             return this.CreateItem(default(TCollectionItem), index);
+        }
+
+        public HelperResult RenderSection(string sectionName)
+        {
+            if (sectionName == null)
+                throw new ArgumentNullException("sectionName");
+
+            return this.RenderSection(sectionName, true);
+        }
+
+        public HelperResult RenderSection([NotNull] string sectionName, bool required)
+        {
+            if (sectionName == null)
+                throw new ArgumentNullException("sectionName");
+
+            var helperResult = this.GetHelperResult(sectionName);
+
+            if (helperResult == null && required)
+                throw new Exception(string.Format("Section must be defined: {0}", sectionName));
+
+            return helperResult;
+        }
+
+        public bool IsSectionDefined([NotNull] string sectionName)
+        {
+            if (sectionName == null)
+                throw new ArgumentNullException("sectionName");
+
+            return this.tableTemplate.IsSectionDefined(sectionName);
+        }
+
+        [CanBeNull]
+        private HelperResult GetHelperResult([NotNull] string sectionName)
+        {
+            if (!this.tableTemplate.IsSectionDefined(sectionName))
+                return null;
+
+            var result = this.tableTemplate.GetSectionHelperResult(sectionName, this.lazyViewTemplate.Value);
+
+            return result;
         }
 
         public TableDataRowRenderer<TCollectionItem> NewItem(int index, TCollectionItem item)
@@ -158,18 +208,57 @@ namespace Masb.Mvc.TableBuilder
         private class TableHeaderRowRendererCreator :
             ITableTemplateVisitor<TModel, TableHeaderRowRenderer>
         {
-            private readonly HtmlHelper html;
+            private readonly HtmlHelper masterHtml;
 
-            public TableHeaderRowRendererCreator(HtmlHelper html)
+            public TableHeaderRowRendererCreator(HtmlHelper masterHtml)
             {
-                this.html = html;
+                this.masterHtml = masterHtml;
             }
 
             public TableHeaderRowRenderer Visit<TCollectionItem1>(ITableTemplate<TModel, TCollectionItem1> value)
             {
-                var allColumns = value.Columns.Select(x => new TableHeaderCellRenderer(x, this.html));
+                var creator = new TableHeaderCellRendererCreator<TCollectionItem1>(this.masterHtml);
+                var allColumns = value.Columns.Select(x => x.Accept(creator));
                 var result = new TableHeaderRowRenderer(allColumns);
                 return result;
+            }
+
+            private class TableHeaderCellRendererCreator<TCollectionItem1> :
+                ITableColumnTemplateFromVisitor<TCollectionItem1, ITableHeaderCellRenderer>
+            {
+                private readonly HtmlHelper rootHtml;
+
+                public TableHeaderCellRendererCreator(HtmlHelper rootHtml)
+                {
+                    this.rootHtml = rootHtml;
+                }
+
+                public ITableHeaderCellRenderer Visit<TSubProperty>(ITableColumnTemplate<TCollectionItem1, TSubProperty> value)
+                {
+                    var viewData = new ViewDataDictionary<TSubProperty>
+                    {
+                        //TemplateInfo =
+                        //{
+                        //    HtmlFieldPrefix = this.html.ViewContext.ViewData.TemplateInfo.GetFullHtmlFieldName(
+                        //        ExpressionHelper.GetExpressionText(value.Expression))
+                        //},
+                        ModelMetadata = ModelMetadata.FromLambdaExpression(
+                            value.Expression,
+                            new ViewDataDictionary<TCollectionItem1>())
+                    };
+
+                    var viewContext = new ViewContext(
+                        this.rootHtml.ViewContext,
+                        this.rootHtml.ViewContext.View,
+                        viewData,
+                        this.rootHtml.ViewContext.TempData,
+                        this.rootHtml.ViewContext.Writer);
+
+                    var viewTemplate = new ViewTemplate<TSubProperty>(viewData, viewContext);
+
+                    var result = new TableHeaderCellRenderer<TSubProperty>(value, viewTemplate);
+                    return result;
+                }
             }
         }
 

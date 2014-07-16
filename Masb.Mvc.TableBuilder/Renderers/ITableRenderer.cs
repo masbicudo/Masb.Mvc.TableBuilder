@@ -1,9 +1,12 @@
 using System.Collections.Generic;
+using System.Web.WebPages;
+using JetBrains.Annotations;
 
 namespace Masb.Mvc.TableBuilder
 {
     public interface ITableRenderer :
-        IViewTemplate
+        IViewTemplate,
+        ISectionRenderer
     {
         TableHeaderRowRenderer Header { get; }
 

@@ -4,14 +4,14 @@ namespace Masb.Mvc.TableBuilder
 {
     public class TableHeaderRowRenderer
     {
-        private readonly IEnumerable<TableHeaderCellRenderer> columns;
+        private readonly IEnumerable<ITableHeaderCellRenderer> columns;
 
-        public TableHeaderRowRenderer(IEnumerable<TableHeaderCellRenderer> columns)
+        public TableHeaderRowRenderer(IEnumerable<ITableHeaderCellRenderer> columns)
         {
             this.columns = columns;
         }
 
-        public IEnumerable<TableHeaderCellRenderer> Cells
+        public IEnumerable<ITableHeaderCellRenderer> Cells
         {
             get { return this.columns; }
         }

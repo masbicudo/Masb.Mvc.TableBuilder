@@ -7,14 +7,19 @@
 }
 @{
     var tableTemplate = this.Html.TableTemplateFor(m => m.Rows)
-        .AddColumnFor(m => m.PersonName, @<div>@item.Meta.GetDisplayName()</div>, @<div>@item.Html.EditorFor(m => m)</div>)
-        .AddColumnFor(m => m.BirthDate, @<div>@item.Meta.GetDisplayName()</div>, @<div>@item.Html.EditorFor(m => m)</div>)
-        .AddColumnFor(m => m.Age, @<div>@item.Meta.GetDisplayName()</div>, @<div>@item.Html.EditorFor(m => m)</div>)
+        .SetColumnSections("ColumnGroup", "HeaderHint")
+        .AddColumnFor(m => m.PersonName, @<div>@item.Meta.GetDisplayName()</div>, @<div>@item.Html.EditorFor(m => m)</div>, @<col style="width: 200px" />, @<text>Name of the person</text>)
+        .AddColumnFor(m => m.BirthDate, @<div>@item.Meta.GetDisplayName()</div>, @<div>@item.Html.EditorFor(m => m)</div>, null, @<text>Date of birth</text>)
+        .AddColumnFor(m => m.Age, @<div>@item.Meta.GetDisplayName()</div>, @<div>@item.Html.EditorFor(m => m)</div>, null, @<text>Age of person</text>)
         .AddColumn(
             @<div>Male/Female property</div>,
             @<div>@(item.Model == null || item.Model.Gender == GenderKinds.Male
-                        ? item.Html.EditorFor(m => m.MaleProp)
-                        : item.Html.EditorFor(m => m.FemaleProp))</div>)
+                                ? item.Html.EditorFor(m => m.MaleProp)
+                                : item.Html.EditorFor(m => m.FemaleProp))
+            </div>,
+            @<col style="color: darkred" />,
+            @<text>Male or female conditional editor</text>)
+        .AddSection("Empty", @<text>Table is empty</text>)
         ;
 }
 @{
@@ -23,40 +28,64 @@
         @{
             var allItems = table.Items.Select(item => item.Html.ViewData.Model).ToArray();
             var header = table.Header;
+            <colgroup>
+                @foreach (var headerColumn in header.Cells)
+                {
+                    if (headerColumn.IsSectionDefined("ColumnGroup"))
+                    {
+                        @headerColumn.RenderSection("ColumnGroup", false)
+                    }
+                    else
+                    {
+                        <col/>
+                    }
+                }
+            </colgroup>
             <thead>
                 <tr>
                     @foreach (var headerColumn in header.Cells)
                     {
-                        <th>
+                        <th title="@headerColumn.RenderSection("HeaderHint")">
                             @headerColumn.Render()
                         </th>
                     }
                 </tr>
             </thead>
         }
-        <tbody>
-            @foreach (var item in table.Items)
-            {
-                <tr id="@item.Html.ViewData.TemplateInfo.GetFullHtmlFieldId("")">
-                    @item.RenderIndexHiddenField()
-                    @foreach (var itemColumn in item.Cells)
+        @if (table.Items.Any())
+        {
+            <tbody>
+                @foreach (var item in table.Items)
+                {
+                    <tr id="@item.Html.ViewData.TemplateInfo.GetFullHtmlFieldId("")">
+                        @item.RenderIndexHiddenField()
+                        @foreach (var itemColumn in item.Cells)
+                        {
+                            <td id="@itemColumn.Html.ViewData.TemplateInfo.GetFullHtmlFieldId("Cell")">
+                                @itemColumn.Render()
+                            </td>
+                        }
+                    </tr>
+                }
+                <tr>
+                    @{ var newItem = table.NewItem(int.MaxValue, null); }
+                    @newItem.RenderIndexHiddenField()
+                    @foreach (var itemColumn in newItem.Cells)
                     {
-                        <td id="@itemColumn.Html.ViewData.TemplateInfo.GetFullHtmlFieldId("Cell")">
+                        <td>
                             @itemColumn.Render()
                         </td>
                     }
                 </tr>
-            }
-            <tr>
-                @{ var newItem = table.NewItem(int.MaxValue, null); }
-                @newItem.RenderIndexHiddenField()
-                @foreach (var itemColumn in newItem.Cells)
-                {
-                    <td>
-                        @itemColumn.Render()
-                    </td>
-                }
-            </tr>
-        </tbody>
+            </tbody>
+        }
+        else
+        {
+            <tbody>
+                <tr>
+                    <td colspan="@table.Header.Cells.Count()">@table.RenderSection("Empty")</td>
+                </tr>
+            </tbody>
+        }
     </table>
 }

@@ -9,6 +9,10 @@ namespace Masb.Mvc.TableBuilder
 
         HelperResult GetDataHelperResult(IViewTemplate<TSubProperty> viewTemplate);
 
+        bool IsSectionDefined(string sectionName);
+
+        HelperResult GetSectionHelperResult(string sectionName, IViewTemplate<TSubProperty> viewTemplate);
+
         TResult Accept<TResult>(ITableColumnTemplateToVisitor<TSubProperty, TResult> visitor);
     }
 }

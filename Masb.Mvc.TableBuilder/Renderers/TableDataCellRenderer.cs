@@ -1,3 +1,4 @@
+using System;
 using System.Web.Mvc;
 using System.Web.WebPages;
 
@@ -19,6 +20,41 @@ namespace Masb.Mvc.TableBuilder
         public HelperResult Render()
         {
             var result = this.tableColumnTemplate.GetDataHelperResult(this.viewTemplate);
+            return result;
+        }
+
+        public HelperResult RenderSection(string sectionName)
+        {
+            return this.RenderSection(sectionName, true);
+        }
+
+        public HelperResult RenderSection(string sectionName, bool required)
+        {
+            var helperResult = this.GetHelperResult(sectionName);
+
+            if (helperResult == null && required)
+                throw new Exception(string.Format("Section must be defined: {0}", sectionName));
+
+            return helperResult;
+        }
+
+        public bool IsSectionDefined(string sectionName)
+        {
+            if (sectionName == null)
+                throw new ArgumentNullException("sectionName");
+
+            return this.tableColumnTemplate.IsSectionDefined(sectionName);
+        }
+
+        private HelperResult GetHelperResult(string sectionName)
+        {
+            if (sectionName != null && !this.tableColumnTemplate.IsSectionDefined(sectionName))
+                return null;
+
+            var result = sectionName == null
+                ? this.tableColumnTemplate.GetHeaderHelperResult(this.viewTemplate)
+                : this.tableColumnTemplate.GetSectionHelperResult(sectionName, this.viewTemplate);
+
             return result;
         }
 

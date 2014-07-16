@@ -72,9 +72,13 @@
   <ItemGroup>
     <Compile Include="HtmlHelperExtensions.cs" />
     <Compile Include="IViewTemplate.cs" />
+    <Compile Include="JetBrains.Annotations\JetBrains.Annotations.cs" />
+    <Compile Include="Renderers\ISectionRenderer.cs" />
     <Compile Include="Renderers\ITableDataCellRenderer.cs" />
     <Compile Include="Renderers\ITableDataRowRenderer.cs" />
+    <Compile Include="Renderers\ITableHeaderCellRenderer.cs" />
     <Compile Include="Renderers\ITableRenderer.cs" />
+    <Compile Include="Renderers\SectionRendererExtensions.cs" />
     <Compile Include="Renderers\TableDataCellRenderer.cs" />
     <Compile Include="Renderers\TableDataRowRenderer.cs" />
     <Compile Include="Renderers\TableHeaderCellRenderer.cs" />
