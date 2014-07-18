@@ -1,15 +1,15 @@
-Masb.Mvc.TableBuilder
+Masb Mvc TableBuilder
 =====================
 
 Minimalist ASP.NET MVC Html Helper to help rendering tabular data, by creating table templates.
 
-**[NuGet Package](https://www.nuget.org/packages/Masb.Mvc.TableBuilder)**
-
-    PM> Install-Package Masb.Mvc.TableBuilder
-
 The real objective here is not to render any HTML.
 This is the programmer's role.
 There are so many helpers that render tables...
+
+**[NuGet Package](https://www.nuget.org/packages/Masb.Mvc.TableBuilder)**
+
+    PM> Install-Package Masb.Mvc.TableBuilder
 
 It's all about separation
 -------------------------
