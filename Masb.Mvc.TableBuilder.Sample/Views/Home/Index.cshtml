@@ -1,4 +1,5 @@
 ﻿@using Masb.Mvc.TableBuilder
+@using Masb.Mvc.TableBuilder.Sample
 @using Masb.Mvc.TableBuilder.Sample.Models
 @model TableViewModel
 @{
@@ -22,70 +23,4 @@
         .AddSection("Empty", @<text>Table is empty</text>)
         ;
 }
-@{
-    var table = this.Html.Table(tableTemplate) as ITableRenderer;
-    <table id="@table.Html.ViewData.TemplateInfo.GetFullHtmlFieldId("")">
-        @{
-            var allItems = table.Items.Select(item => item.Html.ViewData.Model).ToArray();
-            var header = table.Header;
-            <colgroup>
-                @foreach (var headerColumn in header.Cells)
-                {
-                    if (headerColumn.IsSectionDefined("ColumnGroup"))
-                    {
-                        @headerColumn.RenderSection("ColumnGroup", false)
-                    }
-                    else
-                    {
-                        <col/>
-                    }
-                }
-            </colgroup>
-            <thead>
-                <tr>
-                    @foreach (var headerColumn in header.Cells)
-                    {
-                        <th title="@headerColumn.RenderSection("HeaderHint")">
-                            @headerColumn.Render()
-                        </th>
-                    }
-                </tr>
-            </thead>
-        }
-        @if (table.Items.Any())
-        {
-            <tbody>
-                @foreach (var item in table.Items)
-                {
-                    <tr id="@item.Html.ViewData.TemplateInfo.GetFullHtmlFieldId("")">
-                        @item.RenderIndexHiddenField()
-                        @foreach (var itemColumn in item.Cells)
-                        {
-                            <td id="@itemColumn.Html.ViewData.TemplateInfo.GetFullHtmlFieldId("Cell")">
-                                @itemColumn.Render()
-                            </td>
-                        }
-                    </tr>
-                }
-                <tr>
-                    @{ var newItem = table.NewItem(int.MaxValue, null); }
-                    @newItem.RenderIndexHiddenField()
-                    @foreach (var itemColumn in newItem.Cells)
-                    {
-                        <td>
-                            @itemColumn.Render()
-                        </td>
-                    }
-                </tr>
-            </tbody>
-        }
-        else
-        {
-            <tbody>
-                <tr>
-                    <td colspan="@table.Header.Cells.Count()">@table.RenderSection("Empty")</td>
-                </tr>
-            </tbody>
-        }
-    </table>
-}
+@this.Html.MyCustomTable(tableTemplate)
