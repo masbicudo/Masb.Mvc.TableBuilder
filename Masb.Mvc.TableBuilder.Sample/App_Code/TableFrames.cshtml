@@ -46,11 +46,11 @@
         {
             // rendering table items, if any
             <tbody>
-                @foreach (var item in table.Items)
+                @foreach (var obj in table.Items)
                 {
-                    <tr id="@item.Html.ViewData.TemplateInfo.GetFullHtmlFieldId("")">
-                        @item.RenderIndexHiddenField()
-                        @foreach (var itemColumn in item.Cells)
+                    <tr id="@obj.Html.ViewData.TemplateInfo.GetFullHtmlFieldId("")"@obj.RenderSectionWith("Class", @<text> class="@item"</text>)>
+                        @obj.RenderIndexHiddenField()
+                        @foreach (var itemColumn in obj.Cells)
                         {
                             // rendering table data cells
                             <td id="@itemColumn.Html.ViewData.TemplateInfo.GetFullHtmlFieldId("Cell")">

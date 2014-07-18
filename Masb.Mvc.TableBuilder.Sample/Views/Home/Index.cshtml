@@ -15,11 +15,12 @@
         .AddColumn(
             @<div>Male/Female property</div>,
             @<div>@(item.Model == null || item.Model.Gender == GenderKinds.Male
-                                ? item.Html.EditorFor(m => m.MaleProp)
-                                : item.Html.EditorFor(m => m.FemaleProp))
-            </div>,
+                        ? item.Html.EditorFor(m => m.MaleProp)
+                        : item.Html.EditorFor(m => m.FemaleProp))
+             </div>,
             @<col style="color: darkred" />,
             @<text>Male or female conditional editor</text>)
+        .AddItemSection("Class", @<text>odd</text>, vt => vt.Info.RowIndex % 2 == 1)
         .AddSection("Empty", @<text>Table is empty</text>)
         ;
 }

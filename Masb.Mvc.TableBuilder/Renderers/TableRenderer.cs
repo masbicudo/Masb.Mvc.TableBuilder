@@ -42,22 +42,23 @@ namespace Masb.Mvc.TableBuilder
                 if (collection == null)
                     return Enumerable.Empty<ITableDataRowRenderer>();
 
-                var result = collection.Select(this.CreateItem);
+                var result = collection.Select((x, i) => this.CreateItem(x, i, false));
                 return result;
             }
         }
 
         public ITableDataRowRenderer NewItem(int index, object defaultModel)
         {
-            return this.CreateItem((TCollectionItem)defaultModel, index);
+            return this.CreateItem((TCollectionItem)defaultModel, index, true);
         }
 
         public ITableDataRowRenderer NewItem(int index)
         {
-            return this.CreateItem(default(TCollectionItem), index);
+            return this.CreateItem(default(TCollectionItem), index, true);
         }
 
-        public HelperResult RenderSection(string sectionName)
+        [NotNull]
+        public HelperResult RenderSection([NotNull] string sectionName)
         {
             if (sectionName == null)
                 throw new ArgumentNullException("sectionName");
@@ -65,6 +66,7 @@ namespace Masb.Mvc.TableBuilder
             return this.RenderSection(sectionName, true);
         }
 
+        [ContractAnnotation("null <= required: false; notnull <= required: true")]
         public HelperResult RenderSection([NotNull] string sectionName, bool required)
         {
             if (sectionName == null)
@@ -99,10 +101,10 @@ namespace Masb.Mvc.TableBuilder
 
         public TableDataRowRenderer<TCollectionItem> NewItem(int index, TCollectionItem item)
         {
-            return this.CreateItem(item, index);
+            return this.CreateItem(item, index, true);
         }
 
-        private TableDataRowRenderer<TCollectionItem> CreateItem(TCollectionItem item, int index)
+        private TableDataRowRenderer<TCollectionItem> CreateItem(TCollectionItem item, int index, bool isNewRow)
         {
             var indexHiddenFieldName = this.masterHtml.ViewContext.ViewData.TemplateInfo.GetFullHtmlFieldName(
                 ExpressionHelper.GetExpressionText(this.tableTemplate.Expression)) + ".Index";
@@ -193,9 +195,10 @@ namespace Masb.Mvc.TableBuilder
                 this.masterHtml.ViewContext.TempData,
                 this.masterHtml.ViewContext.Writer);
 
-            var viewTemplate = new ViewTemplate<TCollectionItem>(viewData, viewContext);
+            var viewTemplate = new ViewTemplate<TCollectionItem, RowInfo>(viewData, viewContext, info: new RowInfo(index, isNewRow));
 
             var row = new TableDataRowRenderer<TCollectionItem>(
+                this.tableTemplate,
                 this.tableTemplate.Columns,
                 viewTemplate,
                 index,

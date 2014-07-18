@@ -1,6 +1,7 @@
 using System;
 using System.Web.Mvc;
 using System.Web.WebPages;
+using JetBrains.Annotations;
 
 namespace Masb.Mvc.TableBuilder
 {
@@ -28,6 +29,7 @@ namespace Masb.Mvc.TableBuilder
             return this.RenderSection(sectionName, true);
         }
 
+        [ContractAnnotation("null <= required: false; notnull <= required: true")]
         public HelperResult RenderSection(string sectionName, bool required)
         {
             var helperResult = this.GetHelperResult(sectionName);

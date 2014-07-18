@@ -2,6 +2,19 @@
 
 namespace Masb.Mvc.TableBuilder
 {
+    public class ViewTemplate<TModel, TInfo> : ViewTemplate<TModel>,
+        IViewTemplateWithData<TModel, TInfo>,
+        IViewDataContainer
+    {
+        public ViewTemplate(ViewDataDictionary<TModel> viewData, ViewContext viewContext, TInfo info)
+            : base(viewData, viewContext)
+        {
+            this.Info = info;
+        }
+
+        public TInfo Info { get; private set; }
+    }
+
     public class ViewTemplate<TModel> :
         IViewTemplate<TModel>,
         IViewDataContainer

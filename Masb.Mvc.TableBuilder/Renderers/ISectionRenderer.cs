@@ -8,7 +8,7 @@ namespace Masb.Mvc.TableBuilder
         [NotNull]
         HelperResult RenderSection([NotNull] string sectionName);
 
-        [CanBeNull]
+        [ContractAnnotation("null <= required: false; notnull <= required: true")]
         HelperResult RenderSection([NotNull] string sectionName, bool required);
 
         bool IsSectionDefined([NotNull] string sectionName);

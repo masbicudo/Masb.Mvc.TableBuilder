@@ -4,7 +4,8 @@ using System.Web.Mvc;
 namespace Masb.Mvc.TableBuilder
 {
     public interface ITableDataRowRenderer :
-        IViewTemplate
+        IViewTemplate,
+        ISectionRenderer
     {
         /// <summary>
         /// Gets the cells that compose this data row.

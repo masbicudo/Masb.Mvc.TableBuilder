@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Mvc;
+using System.Web.WebPages;
+using JetBrains.Annotations;
 
 namespace Masb.Mvc.TableBuilder
 {
@@ -9,20 +11,23 @@ namespace Masb.Mvc.TableBuilder
         IViewTemplate<TCollectionItem>,
         ITableDataRowRenderer
     {
-        private readonly IEnumerable<ITableColumnTemplateFrom<TCollectionItem>> columns;
-        private readonly IViewTemplate<TCollectionItem> viewTemplate;
+        private readonly ITableTemplateTo<TCollectionItem> tableTemplate;
+        private readonly IEnumerable<ITableColumnTemplateFrom<TCollectionItem>> columnTemplates;
+        private readonly IViewTemplateWithData<TCollectionItem, RowInfo> viewTemplate;
         private readonly int indexToRender;
         private readonly string indexHiddenFieldName;
         private readonly string indexHiddenElementId;
 
         public TableDataRowRenderer(
-            IEnumerable<ITableColumnTemplateFrom<TCollectionItem>> columns,
-            IViewTemplate<TCollectionItem> viewTemplate,
+            ITableTemplateTo<TCollectionItem> table,
+            IEnumerable<ITableColumnTemplateFrom<TCollectionItem>> columnTemplates,
+            IViewTemplateWithData<TCollectionItem, RowInfo> viewTemplate,
             int indexToRender,
             string indexHiddenFieldName,
             string indexHiddenElementId)
         {
-            this.columns = columns;
+            this.tableTemplate = table;
+            this.columnTemplates = columnTemplates;
             this.viewTemplate = viewTemplate;
             this.indexToRender = indexToRender;
             this.indexHiddenFieldName = indexHiddenFieldName;
@@ -37,7 +42,7 @@ namespace Masb.Mvc.TableBuilder
             get
             {
                 var creator = new TableDataCellRendererCreator(this.viewTemplate.Html);
-                var result = this.columns.Select(col => col.Accept(creator));
+                var result = this.columnTemplates.Select(col => col.Accept(creator));
                 return result;
             }
         }
@@ -188,6 +193,44 @@ namespace Masb.Mvc.TableBuilder
         HtmlHelper IViewTemplate.Html
         {
             get { return this.viewTemplate.Html; }
+        }
+
+        public HelperResult RenderSection(string sectionName)
+        {
+            return this.RenderSection(sectionName, true);
+        }
+
+        [ContractAnnotation("null <= required: false; notnull <= required: true")]
+        public HelperResult RenderSection(string sectionName, bool required)
+        {
+            if (sectionName == null)
+                throw new ArgumentNullException("sectionName");
+
+            var helperResult = this.GetHelperResult(sectionName);
+
+            if (helperResult == null && required)
+                throw new Exception(string.Format("Item-section must be defined: {0}", sectionName));
+
+            return helperResult;
+        }
+
+        public bool IsSectionDefined(string sectionName)
+        {
+            if (sectionName == null)
+                throw new ArgumentNullException("sectionName");
+
+            return this.tableTemplate.IsItemSectionDefined(sectionName);
+        }
+
+        [CanBeNull]
+        private HelperResult GetHelperResult([NotNull] string sectionName)
+        {
+            if (!this.tableTemplate.IsItemSectionDefined(sectionName))
+                return null;
+
+            var result = this.tableTemplate.GetItemSectionHelperResult(sectionName, this.viewTemplate);
+
+            return result;
         }
     }
 }

@@ -72,6 +72,7 @@
   <ItemGroup>
     <Compile Include="HtmlHelperExtensions.cs" />
     <Compile Include="IViewTemplate.cs" />
+    <Compile Include="IViewTemplateWithData.cs" />
     <Compile Include="JetBrains.Annotations\JetBrains.Annotations.cs" />
     <Compile Include="Renderers\ISectionRenderer.cs" />
     <Compile Include="Renderers\ITableDataCellRenderer.cs" />
@@ -94,6 +95,7 @@
     <Compile Include="Templates\ITableTemplateTo.cs" />
     <Compile Include="Templates\ITableTemplateToVisitor.cs" />
     <Compile Include="Templates\ITableTemplateVisitor.cs" />
+    <Compile Include="Templates\RowInfo.cs" />
     <Compile Include="Templates\TableColumnTemplate.cs" />
     <Compile Include="Templates\TableTemplate.cs" />
     <Compile Include="ViewTemplate.cs" />

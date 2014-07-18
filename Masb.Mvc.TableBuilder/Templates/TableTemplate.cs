@@ -19,7 +19,10 @@ namespace Masb.Mvc.TableBuilder
         private readonly Dictionary<string, Func<IViewTemplate<IList<TCollectionItem>>, HelperResult>> rootSections
             = new Dictionary<string, Func<IViewTemplate<IList<TCollectionItem>>, HelperResult>>();
 
-        private string[] sectioNames;
+        private readonly Dictionary<string, Func<IViewTemplateWithData<TCollectionItem, RowInfo>, HelperResult>> itemSections
+            = new Dictionary<string, Func<IViewTemplateWithData<TCollectionItem, RowInfo>, HelperResult>>();
+
+        private string[] columnSectioNames;
 
         public TableTemplate(Expression<Func<TModel, IList<TCollectionItem>>> collectionExpression)
         {
@@ -62,13 +65,17 @@ namespace Masb.Mvc.TableBuilder
             get { return new ReadOnlyCollection<ITableColumnTemplateFrom<TCollectionItem>>(this.columns); }
         }
 
-        public bool IsSectionDefined(string sectionName)
+        public bool IsSectionDefined([NotNull] string sectionName)
         {
+            if (sectionName == null)
+                throw new ArgumentNullException("sectionName");
+
             Func<IViewTemplate<IList<TCollectionItem>>, HelperResult> xpto;
             var result = this.rootSections.TryGetValue(sectionName, out xpto) && xpto != null;
             return result;
         }
 
+        [CanBeNull]
         public HelperResult GetSectionHelperResult(
             [NotNull] string sectionName,
             IViewTemplate<IList<TCollectionItem>> viewTemplate)
@@ -78,6 +85,32 @@ namespace Masb.Mvc.TableBuilder
 
             Func<IViewTemplate<IList<TCollectionItem>>, HelperResult> xpto;
             if (!this.rootSections.TryGetValue(sectionName, out xpto) || xpto == null)
+                return null;
+
+            var result = xpto(viewTemplate);
+            return result;
+        }
+
+        public bool IsItemSectionDefined([NotNull] string sectionName)
+        {
+            if (sectionName == null)
+                throw new ArgumentNullException("sectionName");
+
+            Func<IViewTemplateWithData<TCollectionItem, RowInfo>, HelperResult> xpto;
+            var result = this.itemSections.TryGetValue(sectionName, out xpto) && xpto != null;
+            return result;
+        }
+
+        [CanBeNull]
+        public HelperResult GetItemSectionHelperResult(
+            [NotNull] string sectionName,
+            IViewTemplateWithData<TCollectionItem, RowInfo> viewTemplate)
+        {
+            if (sectionName == null)
+                throw new ArgumentNullException("sectionName");
+
+            Func<IViewTemplateWithData<TCollectionItem, RowInfo>, HelperResult> xpto;
+            if (!this.itemSections.TryGetValue(sectionName, out xpto) || xpto == null)
                 return null;
 
             var result = xpto(viewTemplate);
@@ -107,20 +140,20 @@ namespace Masb.Mvc.TableBuilder
             if (this.columns.Count > 0)
                 throw new Exception("Cannot set column sections after adding columns.");
 
-            if (this.sectioNames != null)
+            if (this.columnSectioNames != null)
                 throw new Exception("Cannot set column sections more than once.");
 
             if (sectioNames.Distinct().Count() != sectioNames.Length)
                 throw new Exception("Section names cannot be repeated.");
 
-            this.sectioNames = sectioNames;
+            this.columnSectioNames = sectioNames;
 
             return this;
         }
 
         private Dictionary<string, Func<IViewTemplate<TSubProperty>, HelperResult>> GetSectionsDictionary<TSubProperty>(Func<IViewTemplate<TSubProperty>, HelperResult>[] sections)
         {
-            var definedSections = this.sectioNames ?? new string[0];
+            var definedSections = this.columnSectioNames ?? new string[0];
             var passedSections = sections ?? new Func<IViewTemplate<TSubProperty>, HelperResult>[0];
             if (definedSections.Length != passedSections.Length)
                 throw new Exception("Number of defined sections is different from the number of passed sections.");
@@ -143,6 +176,35 @@ namespace Masb.Mvc.TableBuilder
                 throw new ArgumentNullException("section");
 
             this.rootSections.Add(sectionName, section);
+            return this;
+        }
+
+        public TableTemplate<TModel, TCollectionItem> AddItemSection(
+            [NotNull] string sectionName,
+            [NotNull] Func<IViewTemplateWithData<TCollectionItem, RowInfo>, HelperResult> section)
+        {
+            if (sectionName == null)
+                throw new ArgumentNullException("sectionName");
+
+            if (section == null)
+                throw new ArgumentNullException("section");
+
+            this.itemSections.Add(sectionName, section);
+            return this;
+        }
+
+        public TableTemplate<TModel, TCollectionItem> AddItemSection(
+            [NotNull] string sectionName,
+            [NotNull] Func<IViewTemplateWithData<TCollectionItem, RowInfo>, HelperResult> section,
+            [NotNull] Func<IViewTemplateWithData<TCollectionItem, RowInfo>, bool> predicate)
+        {
+            if (sectionName == null)
+                throw new ArgumentNullException("sectionName");
+
+            if (section == null)
+                throw new ArgumentNullException("section");
+
+            this.itemSections.Add(sectionName, vt => predicate(vt) ? section(vt) : null);
             return this;
         }
     }

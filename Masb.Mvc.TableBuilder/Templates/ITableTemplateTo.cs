@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Web.WebPages;
+using JetBrains.Annotations;
 
 namespace Masb.Mvc.TableBuilder
 {
@@ -10,8 +11,14 @@ namespace Masb.Mvc.TableBuilder
 
         new IEnumerable<ITableColumnTemplateFrom<TCollectionItem>> Columns { get; }
 
-        bool IsSectionDefined(string sectionName);
+        bool IsSectionDefined([NotNull] string sectionName);
 
-        HelperResult GetSectionHelperResult(string sectionName, IViewTemplate<IList<TCollectionItem>> viewTemplate);
+        [CanBeNull]
+        HelperResult GetSectionHelperResult([NotNull] string sectionName, IViewTemplate<IList<TCollectionItem>> viewTemplate);
+
+        bool IsItemSectionDefined([NotNull] string sectionName);
+
+        [CanBeNull]
+        HelperResult GetItemSectionHelperResult([NotNull] string sectionName, IViewTemplateWithData<TCollectionItem, RowInfo> viewTemplate);
     }
 }
