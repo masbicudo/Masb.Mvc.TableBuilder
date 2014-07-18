@@ -93,20 +93,25 @@ This could be defined in another file such as a custom helper (defined in the Ap
     var table = html.Table(tableTemplate);
     <table id="@table.Html.ViewData.TemplateInfo.GetFullHtmlFieldId("")">
         @{
-            // getting all items... just testing
+            // getting all items... just testing (so to show that it is possible)
+            // and rendering these models to JSON
             var allItems = table.Items.Select(item => item.Html.ViewData.Model).ToArray();
-            
+            <script type="text/javascript">
+                Models = @(html.Raw(new JavaScriptSerializer().Serialize(allItems)));
+            </script>
+
             var header = table.Header;
             <colgroup>
                 @foreach (var headerColumn in header.Cells)
                 {
+                    // rendering the section "ColumnGroup",
+                    // passing a default HTML to use when the section is not defined
+                    @headerColumn.RenderSection("ColumnGroup", @<col />)
+
+                    // rendering something using `IsSectionDefined`
                     if (headerColumn.IsSectionDefined("ColumnGroup"))
                     {
-                        @headerColumn.RenderSection("ColumnGroup", false)
-                    }
-                    else
-                    {
-                        <col/>
+                    <!--Section "ColumnGroup" was defined for the previous column-->
                     }
                 }
             </colgroup>
@@ -114,6 +119,9 @@ This could be defined in another file such as a custom helper (defined in the Ap
                 <tr>
                     @foreach (var headerColumn in header.Cells)
                     {
+                        // Rendering section "HeaderHint"... this section is required
+                        // since the single parameter overload is used.
+                        // Then we render the content of the header cell with `Render`.
                         <th title="@headerColumn.RenderSection("HeaderHint")">
                             @headerColumn.Render()
                         </th>
@@ -123,6 +131,7 @@ This could be defined in another file such as a custom helper (defined in the Ap
         }
         @if (table.Items.Any())
         {
+            // rendering table items, if any
             <tbody>
                 @foreach (var item in table.Items)
                 {
@@ -130,26 +139,31 @@ This could be defined in another file such as a custom helper (defined in the Ap
                         @item.RenderIndexHiddenField()
                         @foreach (var itemColumn in item.Cells)
                         {
+                            // rendering table data cells
                             <td id="@itemColumn.Html.ViewData.TemplateInfo.GetFullHtmlFieldId("Cell")">
                                 @itemColumn.Render()
                             </td>
                         }
                     </tr>
                 }
-                <tr>
-                    @{ var newItem = table.NewItem(int.MaxValue, null); }
-                    @newItem.RenderIndexHiddenField()
-                    @foreach (var itemColumn in newItem.Cells)
-                    {
-                        <td>
-                            @itemColumn.Render()
-                        </td>
-                    }
-                </tr>
+                @{
+                // rendering a row that allows new items to be inserted
+                var newItem = table.NewItem(int.MaxValue, null); 
+                    <tr>
+                        @newItem.RenderIndexHiddenField()
+                        @foreach (var itemColumn in newItem.Cells)
+                        {
+                            <td>
+                                @itemColumn.Render()
+                            </td>
+                        }
+                    </tr>
+                }
             </tbody>
         }
         else
         {
+            // rendering the Empty table-level section
             <tbody>
                 <tr>
                     <td colspan="@table.Header.Cells.Count()">@table.RenderSection("Empty")</td>
