@@ -85,13 +85,13 @@ namespace Masb.Mvc.TableBuilder
             if (sectionName == null)
                 throw new ArgumentNullException("sectionName");
 
-            return this.tableTemplate.IsSectionDefined(sectionName);
+            return this.tableTemplate.IsSectionDefined(sectionName, this.lazyViewTemplate.Value);
         }
 
         [CanBeNull]
         private HelperResult GetHelperResult([NotNull] string sectionName)
         {
-            if (!this.tableTemplate.IsSectionDefined(sectionName))
+            if (!this.tableTemplate.IsSectionDefined(sectionName, this.lazyViewTemplate.Value))
                 return null;
 
             var result = this.tableTemplate.GetSectionHelperResult(sectionName, this.lazyViewTemplate.Value);

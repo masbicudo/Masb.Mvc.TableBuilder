@@ -219,13 +219,13 @@ namespace Masb.Mvc.TableBuilder
             if (sectionName == null)
                 throw new ArgumentNullException("sectionName");
 
-            return this.tableTemplate.IsItemSectionDefined(sectionName);
+            return this.tableTemplate.IsItemSectionDefined(sectionName, this.viewTemplate);
         }
 
         [CanBeNull]
         private HelperResult GetHelperResult([NotNull] string sectionName)
         {
-            if (!this.tableTemplate.IsItemSectionDefined(sectionName))
+            if (!this.tableTemplate.IsItemSectionDefined(sectionName, this.viewTemplate))
                 return null;
 
             var result = this.tableTemplate.GetItemSectionHelperResult(sectionName, this.viewTemplate);

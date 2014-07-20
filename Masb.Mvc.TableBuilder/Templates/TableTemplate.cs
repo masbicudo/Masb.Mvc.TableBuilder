@@ -16,11 +16,11 @@ namespace Masb.Mvc.TableBuilder
         private readonly List<ITableColumnTemplateFrom<TCollectionItem>> columns
             = new List<ITableColumnTemplateFrom<TCollectionItem>>();
 
-        private readonly Dictionary<string, Func<IViewTemplate<IList<TCollectionItem>>, HelperResult>> rootSections
-            = new Dictionary<string, Func<IViewTemplate<IList<TCollectionItem>>, HelperResult>>();
+        private readonly Dictionary<string, ISection<IViewTemplate<IList<TCollectionItem>>, HelperResult>> rootSections
+            = new Dictionary<string, ISection<IViewTemplate<IList<TCollectionItem>>, HelperResult>>();
 
-        private readonly Dictionary<string, Func<IViewTemplateWithData<TCollectionItem, RowInfo>, HelperResult>> itemSections
-            = new Dictionary<string, Func<IViewTemplateWithData<TCollectionItem, RowInfo>, HelperResult>>();
+        private readonly Dictionary<string, ISection<IViewTemplateWithData<TCollectionItem, RowInfo>, HelperResult>> itemSections
+            = new Dictionary<string, ISection<IViewTemplateWithData<TCollectionItem, RowInfo>, HelperResult>>();
 
         private string[] columnSectioNames;
 
@@ -65,13 +65,13 @@ namespace Masb.Mvc.TableBuilder
             get { return new ReadOnlyCollection<ITableColumnTemplateFrom<TCollectionItem>>(this.columns); }
         }
 
-        public bool IsSectionDefined([NotNull] string sectionName)
+        public bool IsSectionDefined([NotNull] string sectionName, IViewTemplate<IList<TCollectionItem>> viewTemplate)
         {
             if (sectionName == null)
                 throw new ArgumentNullException("sectionName");
 
-            Func<IViewTemplate<IList<TCollectionItem>>, HelperResult> xpto;
-            var result = this.rootSections.TryGetValue(sectionName, out xpto) && xpto != null;
+            ISection<IViewTemplate<IList<TCollectionItem>>, HelperResult> xpto;
+            var result = this.rootSections.TryGetValue(sectionName, out xpto) && xpto != null && xpto.CanRender(viewTemplate);
             return result;
         }
 
@@ -83,21 +83,23 @@ namespace Masb.Mvc.TableBuilder
             if (sectionName == null)
                 throw new ArgumentNullException("sectionName");
 
-            Func<IViewTemplate<IList<TCollectionItem>>, HelperResult> xpto;
-            if (!this.rootSections.TryGetValue(sectionName, out xpto) || xpto == null)
+            ISection<IViewTemplate<IList<TCollectionItem>>, HelperResult> xpto;
+            if (!this.rootSections.TryGetValue(sectionName, out xpto) || xpto == null || !xpto.CanRender(viewTemplate))
                 return null;
 
-            var result = xpto(viewTemplate);
+            var result = xpto.Render(viewTemplate);
             return result;
         }
 
-        public bool IsItemSectionDefined([NotNull] string sectionName)
+        public bool IsItemSectionDefined(
+            [NotNull] string sectionName,
+            IViewTemplateWithData<TCollectionItem, RowInfo> viewTemplate)
         {
             if (sectionName == null)
                 throw new ArgumentNullException("sectionName");
 
-            Func<IViewTemplateWithData<TCollectionItem, RowInfo>, HelperResult> xpto;
-            var result = this.itemSections.TryGetValue(sectionName, out xpto) && xpto != null;
+            ISection<IViewTemplateWithData<TCollectionItem, RowInfo>, HelperResult> xpto;
+            var result = this.itemSections.TryGetValue(sectionName, out xpto) && xpto != null && xpto.CanRender(viewTemplate);
             return result;
         }
 
@@ -109,11 +111,11 @@ namespace Masb.Mvc.TableBuilder
             if (sectionName == null)
                 throw new ArgumentNullException("sectionName");
 
-            Func<IViewTemplateWithData<TCollectionItem, RowInfo>, HelperResult> xpto;
-            if (!this.itemSections.TryGetValue(sectionName, out xpto) || xpto == null)
+            ISection<IViewTemplateWithData<TCollectionItem, RowInfo>, HelperResult> xpto;
+            if (!this.itemSections.TryGetValue(sectionName, out xpto) || xpto == null || !xpto.CanRender(viewTemplate))
                 return null;
 
-            var result = xpto(viewTemplate);
+            var result = xpto.Render(viewTemplate);
             return result;
         }
 
@@ -175,7 +177,8 @@ namespace Masb.Mvc.TableBuilder
             if (section == null)
                 throw new ArgumentNullException("section");
 
-            this.rootSections.Add(sectionName, section);
+            var sectionObj = new HelperResultSection<IViewTemplate<IList<TCollectionItem>>>(section, null);
+            this.rootSections.Add(sectionName, sectionObj);
             return this;
         }
 
@@ -189,7 +192,8 @@ namespace Masb.Mvc.TableBuilder
             if (section == null)
                 throw new ArgumentNullException("section");
 
-            this.itemSections.Add(sectionName, section);
+            var sectionObj = new HelperResultSection<IViewTemplateWithData<TCollectionItem, RowInfo>>(section, null);
+            this.itemSections.Add(sectionName, sectionObj);
             return this;
         }
 
@@ -204,7 +208,8 @@ namespace Masb.Mvc.TableBuilder
             if (section == null)
                 throw new ArgumentNullException("section");
 
-            this.itemSections.Add(sectionName, vt => predicate(vt) ? section(vt) : null);
+            var sectionObj = new HelperResultSection<IViewTemplateWithData<TCollectionItem, RowInfo>>(section, predicate);
+            this.itemSections.Add(sectionName, sectionObj);
             return this;
         }
     }

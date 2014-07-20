@@ -11,12 +11,12 @@ namespace Masb.Mvc.TableBuilder
 
         new IEnumerable<ITableColumnTemplateFrom<TCollectionItem>> Columns { get; }
 
-        bool IsSectionDefined([NotNull] string sectionName);
+        bool IsSectionDefined([NotNull] string sectionName, IViewTemplate<IList<TCollectionItem>> viewTemplate);
 
         [CanBeNull]
         HelperResult GetSectionHelperResult([NotNull] string sectionName, IViewTemplate<IList<TCollectionItem>> viewTemplate);
 
-        bool IsItemSectionDefined([NotNull] string sectionName);
+        bool IsItemSectionDefined([NotNull] string sectionName, IViewTemplateWithData<TCollectionItem, RowInfo> viewTemplate);
 
         [CanBeNull]
         HelperResult GetItemSectionHelperResult([NotNull] string sectionName, IViewTemplateWithData<TCollectionItem, RowInfo> viewTemplate);
