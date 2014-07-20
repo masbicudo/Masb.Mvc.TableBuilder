@@ -10,15 +10,15 @@ namespace Masb.Mvc.TableBuilder
         ITableColumnTemplate<TCollectionItem, TSubProperty>
     {
         private readonly Expression<Func<TCollectionItem, TSubProperty>> subPropertyExpression;
-        private readonly Func<IViewTemplate, HelperResult> header;
-        private readonly Func<IViewTemplate<TSubProperty>, HelperResult> content;
-        private readonly Dictionary<string, Func<IViewTemplate<TSubProperty>, HelperResult>> sections;
+        private readonly Func<ITemplateArgs, HelperResult> header;
+        private readonly Func<ITemplateArgs<TSubProperty>, HelperResult> content;
+        private readonly Dictionary<string, Func<ITemplateArgs<TSubProperty>, HelperResult>> sections;
 
         public TableColumnTemplate(
             Expression<Func<TCollectionItem, TSubProperty>> subPropertyExpression,
-            Func<IViewTemplate, HelperResult> header,
-            Func<IViewTemplate<TSubProperty>, HelperResult> content,
-            Dictionary<string, Func<IViewTemplate<TSubProperty>, HelperResult>> sections)
+            Func<ITemplateArgs, HelperResult> header,
+            Func<ITemplateArgs<TSubProperty>, HelperResult> content,
+            Dictionary<string, Func<ITemplateArgs<TSubProperty>, HelperResult>> sections)
         {
             this.subPropertyExpression = subPropertyExpression;
             this.header = header;
@@ -37,44 +37,44 @@ namespace Masb.Mvc.TableBuilder
         }
 
         [CanBeNull]
-        public HelperResult GetSectionResult([NotNull] string sectionName, IViewTemplate<TSubProperty> viewTemplate)
+        public HelperResult GetSectionResult([NotNull] string sectionName, ITemplateArgs<TSubProperty> templateArgs)
         {
             if (sectionName == null)
                 throw new ArgumentNullException("sectionName");
 
-            Func<IViewTemplate<TSubProperty>, HelperResult> sectionFunc;
+            Func<ITemplateArgs<TSubProperty>, HelperResult> sectionFunc;
             if (!this.sections.TryGetValue(sectionName, out sectionFunc))
                 return null;
 
-            var result = sectionFunc(viewTemplate);
+            var result = sectionFunc(templateArgs);
             return result;
         }
 
-        public HelperResult GetHeaderHelperResult(IViewTemplate<TSubProperty> viewTemplate)
+        public HelperResult GetHeaderHelperResult(ITemplateArgs<TSubProperty> templateArgs)
         {
-            var result = this.header(viewTemplate);
+            var result = this.header(templateArgs);
             return result;
         }
 
-        public HelperResult GetDataHelperResult(IViewTemplate<TSubProperty> viewTemplate)
+        public HelperResult GetDataHelperResult(ITemplateArgs<TSubProperty> templateArgs)
         {
-            var result = this.content(viewTemplate);
+            var result = this.content(templateArgs);
             return result;
         }
 
         public bool IsSectionDefined(string sectionName)
         {
-            Func<IViewTemplate<TSubProperty>, HelperResult> xpto;
+            Func<ITemplateArgs<TSubProperty>, HelperResult> xpto;
             return this.sections.TryGetValue(sectionName, out xpto) && xpto != null;
         }
 
-        public HelperResult GetSectionHelperResult(string sectionName, IViewTemplate<TSubProperty> viewTemplate)
+        public HelperResult GetSectionHelperResult(string sectionName, ITemplateArgs<TSubProperty> templateArgs)
         {
-            Func<IViewTemplate<TSubProperty>, HelperResult> xpto;
+            Func<ITemplateArgs<TSubProperty>, HelperResult> xpto;
             if (!this.sections.TryGetValue(sectionName, out xpto) || xpto == null)
                 return null;
 
-            var result = xpto(viewTemplate);
+            var result = xpto(templateArgs);
             return result;
         }
 

@@ -1,7 +1,7 @@
 namespace Masb.Mvc.TableBuilder
 {
     public interface ISection<in TInput, out TOutput>
-        where TInput : IViewTemplate
+        where TInput : ITemplateArgs
     {
         /// <summary>
         /// Gets a value indicating whether this section can actually be rendered or not with the given input.

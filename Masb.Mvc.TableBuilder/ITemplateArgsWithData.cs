@@ -8,8 +8,8 @@ namespace Masb.Mvc.TableBuilder
     /// <para><code>(<see cref="Func{T,TResult}"/>)@&lt;div>@item.Url.Action("Index")&lt;/div></code></para>
     /// </summary>
     /// <typeparam name="TInfo">Type of additional data provided to the rendering process.</typeparam>
-    public interface IViewTemplateWithData<out TInfo> :
-        IViewTemplate
+    public interface ITemplateArgsWithData<out TInfo> :
+        ITemplateArgs
     {
         /// <summary>
         /// Gets the index of the row.
@@ -21,13 +21,13 @@ namespace Masb.Mvc.TableBuilder
     /// Represents the `item` object that is passed to inline helpers,
     /// when the inline helper renders model information to the page.
     /// <para>Example:</para>
-    /// <para><code>(<see cref="Func&lt;IViewTemplate&lt;Person>, HelperResult>"/>)@&lt;div>@item.Html.EditorFor(p => p.Name)&lt;/div></code></para>
+    /// <para><code>(<see cref="Func&lt;ITemplateArgs&lt;Person>, HelperResult>"/>)@&lt;div>@item.Html.EditorFor(p => p.Name)&lt;/div></code></para>
     /// </summary>
     /// <typeparam name="TModel">Type of the model to render.</typeparam>
     /// <typeparam name="TInfo">Type of additional data provided to the rendering process.</typeparam>
-    public interface IViewTemplateWithData<TModel, out TInfo> :
-        IViewTemplateWithData<TInfo>,
-        IViewTemplate<TModel>
+    public interface ITemplateArgsWithData<TModel, out TInfo> :
+        ITemplateArgsWithData<TInfo>,
+        ITemplateArgs<TModel>
     {
     }
 }

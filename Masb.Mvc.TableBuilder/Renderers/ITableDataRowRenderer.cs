@@ -4,7 +4,7 @@ using System.Web.Mvc;
 namespace Masb.Mvc.TableBuilder
 {
     public interface ITableDataRowRenderer :
-        IViewTemplate,
+        ITemplateArgs,
         ISectionRenderer
     {
         /// <summary>

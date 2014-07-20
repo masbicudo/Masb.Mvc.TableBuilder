@@ -7,15 +7,15 @@ namespace Masb.Mvc.TableBuilder
 {
     public class TableHeaderCellRenderer<TSubProperty> :
         ITableHeaderCellRenderer,
-        IViewTemplate<TSubProperty>
+        ITemplateArgs<TSubProperty>
     {
         private readonly ITableColumnTemplateTo<TSubProperty> tableColumnTemplate;
-        private readonly IViewTemplate<TSubProperty> viewTemplate;
+        private readonly ITemplateArgs<TSubProperty> templateArgs;
 
-        public TableHeaderCellRenderer(ITableColumnTemplateTo<TSubProperty> tableColumnTemplate, IViewTemplate<TSubProperty> viewTemplate)
+        public TableHeaderCellRenderer(ITableColumnTemplateTo<TSubProperty> tableColumnTemplate, ITemplateArgs<TSubProperty> templateArgs)
         {
             this.tableColumnTemplate = tableColumnTemplate;
-            this.viewTemplate = viewTemplate;
+            this.templateArgs = templateArgs;
         }
 
         public HelperResult Render()
@@ -55,8 +55,8 @@ namespace Masb.Mvc.TableBuilder
                 return null;
 
             var result = sectionName == null
-                ? this.tableColumnTemplate.GetHeaderHelperResult(this.viewTemplate)
-                : this.tableColumnTemplate.GetSectionHelperResult(sectionName, this.viewTemplate);
+                ? this.tableColumnTemplate.GetHeaderHelperResult(this.templateArgs)
+                : this.tableColumnTemplate.GetSectionHelperResult(sectionName, this.templateArgs);
 
             return result;
         }
@@ -69,7 +69,7 @@ namespace Masb.Mvc.TableBuilder
         /// </returns>
         public AjaxHelper<TSubProperty> Ajax
         {
-            get { return this.viewTemplate.Ajax; }
+            get { return this.templateArgs.Ajax; }
         }
 
         /// <summary>
@@ -78,9 +78,9 @@ namespace Masb.Mvc.TableBuilder
         /// <returns>
         /// The <see cref="T:System.Web.Mvc.HtmlHelper"/> object that is used to render HTML elements.
         /// </returns>
-        HtmlHelper<TSubProperty> IViewTemplate<TSubProperty>.Html
+        HtmlHelper<TSubProperty> ITemplateArgs<TSubProperty>.Html
         {
-            get { return this.viewTemplate.Html; }
+            get { return this.templateArgs.Html; }
         }
 
         /// <summary>
@@ -93,7 +93,7 @@ namespace Masb.Mvc.TableBuilder
 
         public ModelMetadata Meta
         {
-            get { return this.viewTemplate.Meta; }
+            get { return this.templateArgs.Meta; }
         }
 
         /// <summary>
@@ -101,7 +101,7 @@ namespace Masb.Mvc.TableBuilder
         /// </summary>
         public UrlHelper Url
         {
-            get { return this.viewTemplate.Url; }
+            get { return this.templateArgs.Url; }
         }
 
         /// <summary>
@@ -110,9 +110,9 @@ namespace Masb.Mvc.TableBuilder
         /// <returns>
         /// The <see cref="T:System.Web.Mvc.AjaxHelper"/> object that is used to render HTML markup using Ajax.
         /// </returns>
-        AjaxHelper IViewTemplate.Ajax
+        AjaxHelper ITemplateArgs.Ajax
         {
-            get { return this.viewTemplate.Ajax; }
+            get { return this.templateArgs.Ajax; }
         }
 
         /// <summary>
@@ -121,9 +121,9 @@ namespace Masb.Mvc.TableBuilder
         /// <returns>
         /// The <see cref="T:System.Web.Mvc.HtmlHelper"/> object that is used to render HTML elements.
         /// </returns>
-        HtmlHelper IViewTemplate.Html
+        HtmlHelper ITemplateArgs.Html
         {
-            get { return this.viewTemplate.Html; }
+            get { return this.templateArgs.Html; }
         }
     }
 }

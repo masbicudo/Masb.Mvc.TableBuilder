@@ -8,12 +8,12 @@ using JetBrains.Annotations;
 namespace Masb.Mvc.TableBuilder
 {
     public class TableDataRowRenderer<TCollectionItem> :
-        IViewTemplate<TCollectionItem>,
+        ITemplateArgs<TCollectionItem>,
         ITableDataRowRenderer
     {
         private readonly ITableTemplateTo<TCollectionItem> tableTemplate;
         private readonly IEnumerable<ITableColumnTemplateFrom<TCollectionItem>> columnTemplates;
-        private readonly IViewTemplateWithData<TCollectionItem, RowInfo> viewTemplate;
+        private readonly ITemplateArgsWithData<TCollectionItem, RowInfo> templateArgs;
         private readonly int indexToRender;
         private readonly string indexHiddenFieldName;
         private readonly string indexHiddenElementId;
@@ -21,14 +21,14 @@ namespace Masb.Mvc.TableBuilder
         public TableDataRowRenderer(
             ITableTemplateTo<TCollectionItem> table,
             IEnumerable<ITableColumnTemplateFrom<TCollectionItem>> columnTemplates,
-            IViewTemplateWithData<TCollectionItem, RowInfo> viewTemplate,
+            ITemplateArgsWithData<TCollectionItem, RowInfo> templateArgs,
             int indexToRender,
             string indexHiddenFieldName,
             string indexHiddenElementId)
         {
             this.tableTemplate = table;
             this.columnTemplates = columnTemplates;
-            this.viewTemplate = viewTemplate;
+            this.templateArgs = templateArgs;
             this.indexToRender = indexToRender;
             this.indexHiddenFieldName = indexHiddenFieldName;
             this.indexHiddenElementId = indexHiddenElementId;
@@ -41,7 +41,7 @@ namespace Masb.Mvc.TableBuilder
         {
             get
             {
-                var creator = new TableDataCellRendererCreator(this.viewTemplate.Html);
+                var creator = new TableDataCellRendererCreator(this.templateArgs.Html);
                 var result = this.columnTemplates.Select(col => col.Accept(creator));
                 return result;
             }
@@ -89,7 +89,7 @@ namespace Masb.Mvc.TableBuilder
                     this.html.ViewContext.TempData,
                     this.html.ViewContext.Writer);
 
-                var viewTemplate = new ViewTemplate<TSubProperty>(viewData, viewContext);
+                var viewTemplate = new TemplateArgs<TSubProperty>(viewData, viewContext);
 
                 var result = new TableDataCellRenderer<TCollectionItem, TSubProperty>(value, viewTemplate);
                 return result;
@@ -138,7 +138,7 @@ namespace Masb.Mvc.TableBuilder
         /// </returns>
         public AjaxHelper<TCollectionItem> Ajax
         {
-            get { return this.viewTemplate.Ajax; }
+            get { return this.templateArgs.Ajax; }
         }
 
         /// <summary>
@@ -147,9 +147,9 @@ namespace Masb.Mvc.TableBuilder
         /// <returns>
         /// The <see cref="T:System.Web.Mvc.HtmlHelper"/> object that is used to render HTML elements.
         /// </returns>
-        HtmlHelper<TCollectionItem> IViewTemplate<TCollectionItem>.Html
+        HtmlHelper<TCollectionItem> ITemplateArgs<TCollectionItem>.Html
         {
-            get { return this.viewTemplate.Html; }
+            get { return this.templateArgs.Html; }
         }
 
         /// <summary>
@@ -157,12 +157,12 @@ namespace Masb.Mvc.TableBuilder
         /// </summary>
         public TCollectionItem Model
         {
-            get { return this.viewTemplate.Model; }
+            get { return this.templateArgs.Model; }
         }
 
         public ModelMetadata Meta
         {
-            get { return this.viewTemplate.Meta; }
+            get { return this.templateArgs.Meta; }
         }
 
         /// <summary>
@@ -170,7 +170,7 @@ namespace Masb.Mvc.TableBuilder
         /// </summary>
         public UrlHelper Url
         {
-            get { return this.viewTemplate.Url; }
+            get { return this.templateArgs.Url; }
         }
 
         /// <summary>
@@ -179,9 +179,9 @@ namespace Masb.Mvc.TableBuilder
         /// <returns>
         /// The <see cref="T:System.Web.Mvc.AjaxHelper"/> object that is used to render HTML markup using Ajax.
         /// </returns>
-        AjaxHelper IViewTemplate.Ajax
+        AjaxHelper ITemplateArgs.Ajax
         {
-            get { return this.viewTemplate.Ajax; }
+            get { return this.templateArgs.Ajax; }
         }
 
         /// <summary>
@@ -190,9 +190,9 @@ namespace Masb.Mvc.TableBuilder
         /// <returns>
         /// The <see cref="T:System.Web.Mvc.HtmlHelper"/> object that is used to render HTML elements.
         /// </returns>
-        HtmlHelper IViewTemplate.Html
+        HtmlHelper ITemplateArgs.Html
         {
-            get { return this.viewTemplate.Html; }
+            get { return this.templateArgs.Html; }
         }
 
         public HelperResult RenderSection(string sectionName)
@@ -219,16 +219,16 @@ namespace Masb.Mvc.TableBuilder
             if (sectionName == null)
                 throw new ArgumentNullException("sectionName");
 
-            return this.tableTemplate.IsItemSectionDefined(sectionName, this.viewTemplate);
+            return this.tableTemplate.IsItemSectionDefined(sectionName, this.templateArgs);
         }
 
         [CanBeNull]
         private HelperResult GetHelperResult([NotNull] string sectionName)
         {
-            if (!this.tableTemplate.IsItemSectionDefined(sectionName, this.viewTemplate))
+            if (!this.tableTemplate.IsItemSectionDefined(sectionName, this.templateArgs))
                 return null;
 
-            var result = this.tableTemplate.GetItemSectionHelperResult(sectionName, this.viewTemplate);
+            var result = this.tableTemplate.GetItemSectionHelperResult(sectionName, this.templateArgs);
 
             return result;
         }

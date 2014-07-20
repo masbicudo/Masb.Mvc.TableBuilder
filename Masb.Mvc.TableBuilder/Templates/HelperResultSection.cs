@@ -5,7 +5,7 @@ namespace Masb.Mvc.TableBuilder
 {
     public class HelperResultSection<TInput> :
         ISection<TInput, HelperResult>
-        where TInput : IViewTemplate
+        where TInput : ITemplateArgs
     {
         private readonly Func<TInput, bool> predicate;
         private readonly Func<TInput, HelperResult> helper;

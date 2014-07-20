@@ -3,7 +3,7 @@ using System.Collections.Generic;
 namespace Masb.Mvc.TableBuilder
 {
     public interface ITableRenderer :
-        IViewTemplate,
+        ITemplateArgs,
         ISectionRenderer
     {
         TableHeaderRowRenderer Header { get; }

@@ -3,7 +3,7 @@ using System.Web.WebPages;
 namespace Masb.Mvc.TableBuilder
 {
     public interface ITableDataCellRenderer :
-        IViewTemplate,
+        ITemplateArgs,
         ISectionRenderer
     {
         HelperResult Render();

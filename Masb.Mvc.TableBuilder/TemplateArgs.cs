@@ -2,11 +2,11 @@
 
 namespace Masb.Mvc.TableBuilder
 {
-    public class ViewTemplate<TModel, TInfo> : ViewTemplate<TModel>,
-        IViewTemplateWithData<TModel, TInfo>,
+    public class TemplateArgs<TModel, TInfo> : TemplateArgs<TModel>,
+        ITemplateArgsWithData<TModel, TInfo>,
         IViewDataContainer
     {
-        public ViewTemplate(ViewDataDictionary<TModel> viewData, ViewContext viewContext, TInfo info)
+        public TemplateArgs(ViewDataDictionary<TModel> viewData, ViewContext viewContext, TInfo info)
             : base(viewData, viewContext)
         {
             this.Info = info;
@@ -15,11 +15,11 @@ namespace Masb.Mvc.TableBuilder
         public TInfo Info { get; private set; }
     }
 
-    public class ViewTemplate<TModel> :
-        IViewTemplate<TModel>,
+    public class TemplateArgs<TModel> :
+        ITemplateArgs<TModel>,
         IViewDataContainer
     {
-        public ViewTemplate(ViewDataDictionary<TModel> viewData, ViewContext viewContext)
+        public TemplateArgs(ViewDataDictionary<TModel> viewData, ViewContext viewContext)
         {
             this.ViewData = viewData;
             this.Meta = viewData.ModelMetadata;
@@ -49,7 +49,7 @@ namespace Masb.Mvc.TableBuilder
         /// <returns>
         /// The <see cref="T:System.Web.Mvc.AjaxHelper"/> object that is used to render HTML markup using Ajax.
         /// </returns>
-        AjaxHelper IViewTemplate.Ajax
+        AjaxHelper ITemplateArgs.Ajax
         {
             get { return this.Ajax; }
         }
@@ -76,7 +76,7 @@ namespace Masb.Mvc.TableBuilder
         /// <returns>
         /// The <see cref="T:System.Web.Mvc.HtmlHelper"/> object that is used to render HTML elements.
         /// </returns>
-        HtmlHelper IViewTemplate.Html
+        HtmlHelper ITemplateArgs.Html
         {
             get { return this.Html; }
         }

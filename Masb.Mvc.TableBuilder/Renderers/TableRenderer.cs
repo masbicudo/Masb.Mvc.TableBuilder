@@ -10,7 +10,7 @@ using JetBrains.Annotations;
 namespace Masb.Mvc.TableBuilder
 {
     public class TableRenderer<TModel, TCollectionItem> :
-        IViewTemplate<IList<TCollectionItem>>,
+        ITemplateArgs<IList<TCollectionItem>>,
         ITableRenderer
     {
         private readonly ITableTemplate<TModel, TCollectionItem> tableTemplate;
@@ -20,7 +20,7 @@ namespace Masb.Mvc.TableBuilder
         {
             this.tableTemplate = tableTemplate;
             this.masterHtml = masterHtml;
-            this.lazyViewTemplate = new Lazy<ViewTemplate<IList<TCollectionItem>>>(this.CreateInnerViewTemplate);
+            this.lazyViewTemplate = new Lazy<TemplateArgs<IList<TCollectionItem>>>(this.CreateInnerViewTemplate);
         }
 
         public TableHeaderRowRenderer Header
@@ -195,7 +195,7 @@ namespace Masb.Mvc.TableBuilder
                 this.masterHtml.ViewContext.TempData,
                 this.masterHtml.ViewContext.Writer);
 
-            var viewTemplate = new ViewTemplate<TCollectionItem, RowInfo>(viewData, viewContext, info: new RowInfo(index, isNewRow));
+            var viewTemplate = new TemplateArgs<TCollectionItem, RowInfo>(viewData, viewContext, info: new RowInfo(index, isNewRow));
 
             var row = new TableDataRowRenderer<TCollectionItem>(
                 this.tableTemplate,
@@ -257,7 +257,7 @@ namespace Masb.Mvc.TableBuilder
                         this.rootHtml.ViewContext.TempData,
                         this.rootHtml.ViewContext.Writer);
 
-                    var viewTemplate = new ViewTemplate<TSubProperty>(viewData, viewContext);
+                    var viewTemplate = new TemplateArgs<TSubProperty>(viewData, viewContext);
 
                     var result = new TableHeaderCellRenderer<TSubProperty>(value, viewTemplate);
                     return result;
@@ -265,9 +265,9 @@ namespace Masb.Mvc.TableBuilder
             }
         }
 
-        private readonly Lazy<ViewTemplate<IList<TCollectionItem>>> lazyViewTemplate;
+        private readonly Lazy<TemplateArgs<IList<TCollectionItem>>> lazyViewTemplate;
 
-        public ViewTemplate<IList<TCollectionItem>> CreateInnerViewTemplate()
+        public TemplateArgs<IList<TCollectionItem>> CreateInnerViewTemplate()
         {
             var getter = this.tableTemplate.Expression.Compile();
             var collection = getter(this.masterHtml.ViewData.Model);
@@ -290,7 +290,7 @@ namespace Masb.Mvc.TableBuilder
                 this.masterHtml.ViewContext.TempData,
                 this.masterHtml.ViewContext.Writer);
 
-            var viewTemplate = new ViewTemplate<IList<TCollectionItem>>(viewData, viewContext);
+            var viewTemplate = new TemplateArgs<IList<TCollectionItem>>(viewData, viewContext);
 
             return viewTemplate;
         }
@@ -312,7 +312,7 @@ namespace Masb.Mvc.TableBuilder
         /// <returns>
         /// The <see cref="T:System.Web.Mvc.HtmlHelper"/> object that is used to render HTML elements.
         /// </returns>
-        HtmlHelper<IList<TCollectionItem>> IViewTemplate<IList<TCollectionItem>>.Html
+        HtmlHelper<IList<TCollectionItem>> ITemplateArgs<IList<TCollectionItem>>.Html
         {
             get { return this.lazyViewTemplate.Value.Html; }
         }
@@ -344,7 +344,7 @@ namespace Masb.Mvc.TableBuilder
         /// <returns>
         /// The <see cref="T:System.Web.Mvc.AjaxHelper"/> object that is used to render HTML markup using Ajax.
         /// </returns>
-        AjaxHelper IViewTemplate.Ajax
+        AjaxHelper ITemplateArgs.Ajax
         {
             get { return this.lazyViewTemplate.Value.Ajax; }
         }
@@ -355,7 +355,7 @@ namespace Masb.Mvc.TableBuilder
         /// <returns>
         /// The <see cref="T:System.Web.Mvc.HtmlHelper"/> object that is used to render HTML elements.
         /// </returns>
-        HtmlHelper IViewTemplate.Html
+        HtmlHelper ITemplateArgs.Html
         {
             get { return this.lazyViewTemplate.Value.Html; }
         }

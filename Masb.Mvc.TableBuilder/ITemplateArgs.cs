@@ -6,9 +6,9 @@ namespace Masb.Mvc.TableBuilder
     /// <summary>
     /// Represents the `item` object that is passed to inline helpers.
     /// <para>Example:</para>
-    /// <para><code>(<see cref="Func&lt;IViewTemplate, HelperResult>"/>)@&lt;div>@item.Url.Action("Index")&lt;/div></code></para>
+    /// <para><code>(<see cref="Func&lt;ITemplateArgs, HelperResult>"/>)@&lt;div>@item.Url.Action("Index")&lt;/div></code></para>
     /// </summary>
-    public interface IViewTemplate
+    public interface ITemplateArgs
     {
         /// <summary>
         /// Gets the <see cref="ModelMetadata"/> associated with this view template.
@@ -41,11 +41,11 @@ namespace Masb.Mvc.TableBuilder
     /// Represents the `item` object that is passed to inline helpers,
     /// when the inline helper renders model information to the page.
     /// <para>Example:</para>
-    /// <para><code>(<see cref="Func&lt;IViewTemplate&lt;Person>, HelperResult>"/>)@&lt;div>@item.Html.EditorFor(p => p.Name)&lt;/div></code></para>
+    /// <para><code>(<see cref="Func&lt;ITemplateArgs&lt;Person>, HelperResult>"/>)@&lt;div>@item.Html.EditorFor(p => p.Name)&lt;/div></code></para>
     /// </summary>
     /// <typeparam name="TModel">Type of the model to render.</typeparam>
-    public interface IViewTemplate<TModel> :
-        IViewTemplate
+    public interface ITemplateArgs<TModel> :
+        ITemplateArgs
     {
         /// <summary>
         /// Gets the <see cref="T:System.Web.Mvc.AjaxHelper"/> object that is used to render HTML markup using Ajax.
