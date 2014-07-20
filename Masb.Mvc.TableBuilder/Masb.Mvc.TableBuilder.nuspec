@@ -15,10 +15,11 @@
         Package containing `TableTemplateFor` and `Table` extension methods.
         TableTemplateFor is used to create a table template.
         Table is used in the rendering process, by using a previously created template.
+        See the project page for information on how to use and for samples.
     </releaseNotes>
     <copyright>Copyright Miguel Angelo 2014</copyright>
     <tags>
-        TableTemplateFor Table Builder Template Masb
+        TableTemplateFor Table Builder Template AspNet Asp Net Mvc Masb
     </tags>
   </metadata>
 </package>
