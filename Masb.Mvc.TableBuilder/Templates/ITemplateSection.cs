@@ -1,6 +1,11 @@
 namespace Masb.Mvc.TableBuilder
 {
-    public interface ISection<in TInput, out TOutput>
+    /// <summary>
+    /// Represents a section of a template.
+    /// </summary>
+    /// <typeparam name="TInput">Type of input that will be passed to the template when rendering.</typeparam>
+    /// <typeparam name="TOutput">The type that results from this section.</typeparam>
+    public interface ITemplateSection<in TInput, out TOutput>
         where TInput : ITemplateArgs
     {
         /// <summary>

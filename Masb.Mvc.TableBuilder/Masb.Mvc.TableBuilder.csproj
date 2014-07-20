@@ -85,8 +85,8 @@
     <Compile Include="Renderers\TableHeaderCellRenderer.cs" />
     <Compile Include="Renderers\TableHeaderRowRenderer.cs" />
     <Compile Include="Renderers\TableRenderer.cs" />
-    <Compile Include="Templates\HelperResultSection.cs" />
-    <Compile Include="Templates\ISection.cs" />
+    <Compile Include="Templates\HelperResultTemplateSection.cs" />
+    <Compile Include="Templates\ITemplateSection.cs" />
     <Compile Include="Templates\ITableColumnTemplate.cs" />
     <Compile Include="Templates\ITableColumnTemplateFrom.cs" />
     <Compile Include="Templates\ITableColumnTemplateFromVisitor.cs" />

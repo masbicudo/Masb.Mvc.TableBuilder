@@ -3,14 +3,14 @@ using System.Web.WebPages;
 
 namespace Masb.Mvc.TableBuilder
 {
-    public class HelperResultSection<TInput> :
-        ISection<TInput, HelperResult>
+    public class HelperResultTemplateSection<TInput> :
+        ITemplateSection<TInput, HelperResult>
         where TInput : ITemplateArgs
     {
         private readonly Func<TInput, bool> predicate;
         private readonly Func<TInput, HelperResult> helper;
 
-        public HelperResultSection(Func<TInput, HelperResult> helper, Func<TInput, bool> predicate)
+        public HelperResultTemplateSection(Func<TInput, HelperResult> helper, Func<TInput, bool> predicate)
         {
             this.predicate = predicate;
             this.helper = helper;
