@@ -1,5 +1,6 @@
 using System;
 using System.Web.WebPages;
+using JetBrains.Annotations;
 
 namespace Masb.Mvc.TableBuilder
 {
@@ -7,10 +8,13 @@ namespace Masb.Mvc.TableBuilder
         ITemplateSection<TInput, HelperResult>
         where TInput : ITemplateArgs
     {
+        [CanBeNull]
         private readonly Func<TInput, bool> predicate;
+
+        [NotNull]
         private readonly Func<TInput, HelperResult> helper;
 
-        public HelperResultTemplateSection(Func<TInput, HelperResult> helper, Func<TInput, bool> predicate)
+        public HelperResultTemplateSection([NotNull] Func<TInput, HelperResult> helper, [CanBeNull] Func<TInput, bool> predicate)
         {
             this.predicate = predicate;
             this.helper = helper;
@@ -25,7 +29,7 @@ namespace Masb.Mvc.TableBuilder
         /// </returns>
         public virtual bool CanRender(TInput input)
         {
-            return this.predicate(input);
+            return this.predicate == null || this.predicate(input);
         }
 
         /// <summary>
