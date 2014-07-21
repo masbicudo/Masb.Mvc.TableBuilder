@@ -365,7 +365,7 @@ namespace Masb.Mvc.TableBuilder
         /// <returns>
         /// The <see cref="T:System.Web.Mvc.HtmlHelper"/> object that is used to render HTML elements.
         /// </returns>
-        HtmlHelper<IList<TCollectionItem>> IHelperContext<IList<TCollectionItem>>.Html
+        public HtmlHelper<IList<TCollectionItem>> Html
         {
             get { return this.lazyViewTemplate.Value.Html; }
         }
@@ -378,6 +378,9 @@ namespace Masb.Mvc.TableBuilder
             get { return this.lazyViewTemplate.Value.Model; }
         }
 
+        /// <summary>
+        /// Gets the <see cref="ModelMetadata"/> associated with this object.
+        /// </summary>
         public ModelMetadata Meta
         {
             get { return this.lazyViewTemplate.Value.Meta; }
