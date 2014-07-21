@@ -71,6 +71,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="HtmlHelperExtensions.cs" />
+    <Compile Include="IHelperContext.cs" />
     <Compile Include="ITemplateArgs.cs" />
     <Compile Include="ITemplateArgsWithData.cs" />
     <Compile Include="JetBrains.Annotations\JetBrains.Annotations.cs" />
@@ -89,14 +90,14 @@
     <Compile Include="Templates\ITemplateSection.cs" />
     <Compile Include="Templates\ITableColumnTemplate.cs" />
     <Compile Include="Templates\ITableColumnTemplateFrom.cs" />
-    <Compile Include="Templates\ITableColumnTemplateFromVisitor.cs" />
+    <Compile Include="Templates\Visitors\ITableColumnTemplateFromVisitor.cs" />
     <Compile Include="Templates\ITableColumnTemplateTo.cs" />
-    <Compile Include="Templates\ITableColumnTemplateToVisitor.cs" />
-    <Compile Include="Templates\ITableColumnTemplateVisitor.cs" />
+    <Compile Include="Templates\Visitors\ITableColumnTemplateToVisitor.cs" />
+    <Compile Include="Templates\Visitors\ITableColumnTemplateVisitor.cs" />
     <Compile Include="Templates\ITableTemplate.cs" />
     <Compile Include="Templates\ITableTemplateTo.cs" />
-    <Compile Include="Templates\ITableTemplateToVisitor.cs" />
-    <Compile Include="Templates\ITableTemplateVisitor.cs" />
+    <Compile Include="Templates\Visitors\ITableTemplateToVisitor.cs" />
+    <Compile Include="Templates\Visitors\ITableTemplateVisitor.cs" />
     <Compile Include="Templates\RowInfo.cs" />
     <Compile Include="Templates\TableColumnTemplate.cs" />
     <Compile Include="Templates\TableTemplate.cs" />

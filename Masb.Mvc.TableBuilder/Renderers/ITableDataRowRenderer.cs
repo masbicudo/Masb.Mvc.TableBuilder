@@ -3,8 +3,11 @@ using System.Web.Mvc;
 
 namespace Masb.Mvc.TableBuilder
 {
+    /// <summary>
+    /// Represents the ability to render table rows.
+    /// </summary>
     public interface ITableDataRowRenderer :
-        ITemplateArgs,
+        IHelperContext,
         ISectionRenderer
     {
         /// <summary>

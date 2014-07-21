@@ -9,31 +9,48 @@ using JetBrains.Annotations;
 
 namespace Masb.Mvc.TableBuilder
 {
+    /// <summary>
+    /// Represents a table rendering helper, that renders table templates.
+    /// </summary>
+    /// <typeparam name="TModel">Type of the root model.</typeparam>
+    /// <typeparam name="TCollectionItem">Type of the collection item, rendered as data rows.</typeparam>
     public class TableRenderer<TModel, TCollectionItem> :
-        ITemplateArgs<IList<TCollectionItem>>,
+        IHelperContext<IList<TCollectionItem>>,
         ITableRenderer
     {
         private readonly ITableTemplate<TModel, TCollectionItem> tableTemplate;
         private readonly HtmlHelper<TModel> masterHtml;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TableRenderer{TModel,TCollectionItem}"/> class.
+        /// </summary>
+        /// <param name="tableTemplate"> Table template to render. </param>
+        /// <param name="masterHtml"> The master <see cref="HtmlHelper"/>. </param>
         public TableRenderer(ITableTemplate<TModel, TCollectionItem> tableTemplate, HtmlHelper<TModel> masterHtml)
         {
             this.tableTemplate = tableTemplate;
             this.masterHtml = masterHtml;
-            this.lazyViewTemplate = new Lazy<TemplateArgs<IList<TCollectionItem>>>(this.CreateInnerViewTemplate);
+            this.lazyViewTemplate = new Lazy<TemplateArgs<IList<TCollectionItem>>>(this.CreateTemplateArgs);
         }
 
+        /// <summary>
+        /// Gets the header renderer.
+        /// </summary>
         public TableHeaderRowRenderer Header
         {
             get { return this.tableTemplate.Accept(new TableHeaderRowRendererCreator(this.masterHtml)); }
         }
 
+        /// <summary>
+        /// Gets a renderer for each item in the table.
+        /// </summary>
         public IEnumerable<ITableDataRowRenderer> Items
         {
             get
             {
                 var getter = this.tableTemplate.Expression.Compile();
 
+                // ReSharper disable once CompareNonConstrainedGenericWithNull
                 if (this.masterHtml.ViewData.Model == null)
                     return Enumerable.Empty<ITableDataRowRenderer>();
 
@@ -47,61 +64,36 @@ namespace Masb.Mvc.TableBuilder
             }
         }
 
+        /// <summary>
+        /// Returns a renderer for a row that allows the insertion of new items.
+        /// </summary>
+        /// <param name="index">Index that is going to be considered as a new item.</param>
+        /// <param name="defaultModel">Default model that will be used to render this new row.</param>
+        /// <returns>A renderer that helps rendering the "new line".</returns>
         public ITableDataRowRenderer NewItem(int index, object defaultModel)
         {
             return this.CreateItem((TCollectionItem)defaultModel, index, true);
         }
 
+        /// <summary>
+        /// Returns a renderer for a row that allows the insertion of new items.
+        /// </summary>
+        /// <param name="index">Index that is going to be considered as a new item.</param>
+        /// <returns>A renderer that helps rendering the "new line".</returns>
         public ITableDataRowRenderer NewItem(int index)
         {
             return this.CreateItem(default(TCollectionItem), index, true);
         }
 
-        [NotNull]
-        public HelperResult RenderSection([NotNull] string sectionName)
+        /// <summary>
+        /// Returns a renderer for a row that allows the insertion of new items.
+        /// </summary>
+        /// <param name="index">Index that is going to be considered as a new item.</param>
+        /// <param name="defaultModel">Default model that will be used to render this new row.</param>
+        /// <returns>A renderer that helps rendering the "new line".</returns>
+        public TableDataRowRenderer<TCollectionItem> NewItem(int index, TCollectionItem defaultModel)
         {
-            if (sectionName == null)
-                throw new ArgumentNullException("sectionName");
-
-            return this.RenderSection(sectionName, true);
-        }
-
-        [ContractAnnotation("null <= required: false; notnull <= required: true")]
-        public HelperResult RenderSection([NotNull] string sectionName, bool required)
-        {
-            if (sectionName == null)
-                throw new ArgumentNullException("sectionName");
-
-            var helperResult = this.GetHelperResult(sectionName);
-
-            if (helperResult == null && required)
-                throw new Exception(string.Format("Section must be defined: {0}", sectionName));
-
-            return helperResult;
-        }
-
-        public bool IsSectionDefined([NotNull] string sectionName)
-        {
-            if (sectionName == null)
-                throw new ArgumentNullException("sectionName");
-
-            return this.tableTemplate.IsSectionDefined(sectionName, this.lazyViewTemplate.Value);
-        }
-
-        [CanBeNull]
-        private HelperResult GetHelperResult([NotNull] string sectionName)
-        {
-            if (!this.tableTemplate.IsSectionDefined(sectionName, this.lazyViewTemplate.Value))
-                return null;
-
-            var result = this.tableTemplate.GetSectionHelperResult(sectionName, this.lazyViewTemplate.Value);
-
-            return result;
-        }
-
-        public TableDataRowRenderer<TCollectionItem> NewItem(int index, TCollectionItem item)
-        {
-            return this.CreateItem(item, index, true);
+            return this.CreateItem(defaultModel, index, true);
         }
 
         private TableDataRowRenderer<TCollectionItem> CreateItem(TCollectionItem item, int index, bool isNewRow)
@@ -195,7 +187,10 @@ namespace Masb.Mvc.TableBuilder
                 this.masterHtml.ViewContext.TempData,
                 this.masterHtml.ViewContext.Writer);
 
-            var viewTemplate = new TemplateArgs<TCollectionItem, RowInfo>(viewData, viewContext, info: new RowInfo(index, isNewRow));
+            var viewTemplate = new TemplateArgs<TCollectionItem, RowInfo>(
+                viewData,
+                viewContext,
+                new RowInfo(index, isNewRow));
 
             var row = new TableDataRowRenderer<TCollectionItem>(
                 this.tableTemplate,
@@ -206,6 +201,63 @@ namespace Masb.Mvc.TableBuilder
                 indexHiddenElementId);
 
             return row;
+        }
+
+        /// <summary>
+        /// Renders a named section.
+        /// </summary>
+        /// <param name="sectionName">Name of the section to render.</param>
+        /// <returns>A <see cref="HelperResult"/> that writes the section to the output stream.</returns>
+        public HelperResult RenderSection(string sectionName)
+        {
+            if (sectionName == null)
+                throw new ArgumentNullException("sectionName");
+
+            return this.RenderSection(sectionName, true);
+        }
+
+        /// <summary>
+        /// Renders a named section.
+        /// </summary>
+        /// <param name="sectionName">Name of the section to render.</param>
+        /// <param name="required">A value indicating whether the section is required or not.</param>
+        /// <returns>A <see cref="HelperResult"/> that writes the section to the output stream.</returns>
+        [ContractAnnotation("null <= required: false; notnull <= required: true")]
+        public HelperResult RenderSection(string sectionName, bool required)
+        {
+            if (sectionName == null)
+                throw new ArgumentNullException("sectionName");
+
+            var helperResult = this.GetHelperResult(sectionName);
+
+            if (helperResult == null && required)
+                throw new Exception(string.Format("Section must be defined: {0}", sectionName));
+
+            return helperResult;
+        }
+
+        /// <summary>
+        /// Returns a value indicating whether the named section is defined or not.
+        /// </summary>
+        /// <param name="sectionName">Name of the section to test.</param>
+        /// <returns>True if the section is defined; otherwise False.</returns>
+        public bool IsSectionDefined(string sectionName)
+        {
+            if (sectionName == null)
+                throw new ArgumentNullException("sectionName");
+
+            return this.tableTemplate.IsSectionDefined(sectionName, this.lazyViewTemplate.Value);
+        }
+
+        [CanBeNull]
+        private HelperResult GetHelperResult([NotNull] string sectionName)
+        {
+            if (!this.tableTemplate.IsSectionDefined(sectionName, this.lazyViewTemplate.Value))
+                return null;
+
+            var result = this.tableTemplate.GetSectionHelperResult(sectionName, this.lazyViewTemplate.Value);
+
+            return result;
         }
 
         private class TableHeaderRowRendererCreator :
@@ -240,11 +292,12 @@ namespace Masb.Mvc.TableBuilder
                 {
                     var viewData = new ViewDataDictionary<TSubProperty>
                     {
-                        //TemplateInfo =
-                        //{
-                        //    HtmlFieldPrefix = this.html.ViewContext.ViewData.TemplateInfo.GetFullHtmlFieldName(
-                        //        ExpressionHelper.GetExpressionText(value.Expression))
-                        //},
+                        // Commented code: This code is commented to show what IS NOT NEEDED in this case, because this is a HEADER CELL.
+                        ////TemplateInfo =
+                        ////{
+                        ////    HtmlFieldPrefix = this.html.ViewContext.ViewData.TemplateInfo.GetFullHtmlFieldName(
+                        ////        ExpressionHelper.GetExpressionText(value.Expression))
+                        ////},
                         ModelMetadata = ModelMetadata.FromLambdaExpression(
                             value.Expression,
                             new ViewDataDictionary<TCollectionItem1>())
@@ -267,7 +320,7 @@ namespace Masb.Mvc.TableBuilder
 
         private readonly Lazy<TemplateArgs<IList<TCollectionItem>>> lazyViewTemplate;
 
-        public TemplateArgs<IList<TCollectionItem>> CreateInnerViewTemplate()
+        private TemplateArgs<IList<TCollectionItem>> CreateTemplateArgs()
         {
             var getter = this.tableTemplate.Expression.Compile();
             var collection = getter(this.masterHtml.ViewData.Model);
@@ -312,7 +365,7 @@ namespace Masb.Mvc.TableBuilder
         /// <returns>
         /// The <see cref="T:System.Web.Mvc.HtmlHelper"/> object that is used to render HTML elements.
         /// </returns>
-        HtmlHelper<IList<TCollectionItem>> ITemplateArgs<IList<TCollectionItem>>.Html
+        HtmlHelper<IList<TCollectionItem>> IHelperContext<IList<TCollectionItem>>.Html
         {
             get { return this.lazyViewTemplate.Value.Html; }
         }
@@ -344,7 +397,7 @@ namespace Masb.Mvc.TableBuilder
         /// <returns>
         /// The <see cref="T:System.Web.Mvc.AjaxHelper"/> object that is used to render HTML markup using Ajax.
         /// </returns>
-        AjaxHelper ITemplateArgs.Ajax
+        AjaxHelper IHelperContext.Ajax
         {
             get { return this.lazyViewTemplate.Value.Ajax; }
         }
@@ -355,7 +408,7 @@ namespace Masb.Mvc.TableBuilder
         /// <returns>
         /// The <see cref="T:System.Web.Mvc.HtmlHelper"/> object that is used to render HTML elements.
         /// </returns>
-        HtmlHelper ITemplateArgs.Html
+        HtmlHelper IHelperContext.Html
         {
             get { return this.lazyViewTemplate.Value.Html; }
         }

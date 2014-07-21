@@ -7,8 +7,12 @@ using JetBrains.Annotations;
 
 namespace Masb.Mvc.TableBuilder
 {
+    /// <summary>
+    /// Represents a table row rendering helper, that renders table rows based on column templates.
+    /// </summary>
+    /// <typeparam name="TCollectionItem">Type of the collection item, that is the model of the data row.</typeparam>
     public class TableDataRowRenderer<TCollectionItem> :
-        ITemplateArgs<TCollectionItem>,
+        IHelperContext<TCollectionItem>,
         ITableDataRowRenderer
     {
         private readonly ITableTemplateTo<TCollectionItem> tableTemplate;
@@ -147,7 +151,7 @@ namespace Masb.Mvc.TableBuilder
         /// <returns>
         /// The <see cref="T:System.Web.Mvc.HtmlHelper"/> object that is used to render HTML elements.
         /// </returns>
-        HtmlHelper<TCollectionItem> ITemplateArgs<TCollectionItem>.Html
+        HtmlHelper<TCollectionItem> IHelperContext<TCollectionItem>.Html
         {
             get { return this.templateArgs.Html; }
         }
@@ -160,6 +164,9 @@ namespace Masb.Mvc.TableBuilder
             get { return this.templateArgs.Model; }
         }
 
+        /// <summary>
+        /// Gets the <see cref="ModelMetadata"/> associated with this object.
+        /// </summary>
         public ModelMetadata Meta
         {
             get { return this.templateArgs.Meta; }
@@ -179,7 +186,7 @@ namespace Masb.Mvc.TableBuilder
         /// <returns>
         /// The <see cref="T:System.Web.Mvc.AjaxHelper"/> object that is used to render HTML markup using Ajax.
         /// </returns>
-        AjaxHelper ITemplateArgs.Ajax
+        AjaxHelper IHelperContext.Ajax
         {
             get { return this.templateArgs.Ajax; }
         }
@@ -190,16 +197,27 @@ namespace Masb.Mvc.TableBuilder
         /// <returns>
         /// The <see cref="T:System.Web.Mvc.HtmlHelper"/> object that is used to render HTML elements.
         /// </returns>
-        HtmlHelper ITemplateArgs.Html
+        HtmlHelper IHelperContext.Html
         {
             get { return this.templateArgs.Html; }
         }
 
+        /// <summary>
+        /// Renders a named section.
+        /// </summary>
+        /// <param name="sectionName">Name of the section to render.</param>
+        /// <returns>A <see cref="HelperResult"/> that writes the section to the output stream.</returns>
         public HelperResult RenderSection(string sectionName)
         {
             return this.RenderSection(sectionName, true);
         }
 
+        /// <summary>
+        /// Renders a named section.
+        /// </summary>
+        /// <param name="sectionName">Name of the section to render.</param>
+        /// <param name="required">A value indicating whether the section is required or not.</param>
+        /// <returns>A <see cref="HelperResult"/> that writes the section to the output stream.</returns>
         [ContractAnnotation("null <= required: false; notnull <= required: true")]
         public HelperResult RenderSection(string sectionName, bool required)
         {
@@ -214,6 +232,11 @@ namespace Masb.Mvc.TableBuilder
             return helperResult;
         }
 
+        /// <summary>
+        /// Returns a value indicating whether the named section is defined or not.
+        /// </summary>
+        /// <param name="sectionName">Name of the section to test.</param>
+        /// <returns>True if the section is defined; otherwise False.</returns>
         public bool IsSectionDefined(string sectionName)
         {
             if (sectionName == null)

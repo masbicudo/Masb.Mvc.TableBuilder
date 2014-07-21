@@ -5,30 +5,51 @@ using JetBrains.Annotations;
 
 namespace Masb.Mvc.TableBuilder
 {
+    /// <summary>
+    /// Represents a table data cell rendering helper, that renders based on a column template.
+    /// </summary>
+    /// <typeparam name="TSubProperty">Type of the sub-property of the item, that is the model of data cells in this column.</typeparam>
     public class TableHeaderCellRenderer<TSubProperty> :
         ITableHeaderCellRenderer,
-        ITemplateArgs<TSubProperty>
+        IHelperContext<TSubProperty>
     {
         private readonly ITableColumnTemplateTo<TSubProperty> tableColumnTemplate;
         private readonly ITemplateArgs<TSubProperty> templateArgs;
 
-        public TableHeaderCellRenderer(ITableColumnTemplateTo<TSubProperty> tableColumnTemplate, ITemplateArgs<TSubProperty> templateArgs)
+        public TableHeaderCellRenderer(
+            ITableColumnTemplateTo<TSubProperty> tableColumnTemplate,
+            ITemplateArgs<TSubProperty> templateArgs)
         {
             this.tableColumnTemplate = tableColumnTemplate;
             this.templateArgs = templateArgs;
         }
 
+        /// <summary>
+        /// Renders the current header cell contents.
+        /// </summary>
+        /// <returns>A <see cref="HelperResult"/> that writes the contents of the header cell to the output stream.</returns>
         public HelperResult Render()
         {
             var helperResult = this.GetHelperResult(null);
             return helperResult;
         }
 
+        /// <summary>
+        /// Renders a named section.
+        /// </summary>
+        /// <param name="sectionName">Name of the section to render.</param>
+        /// <returns>A <see cref="HelperResult"/> that writes the section to the output stream.</returns>
         public HelperResult RenderSection(string sectionName)
         {
             return this.RenderSection(sectionName, true);
         }
 
+        /// <summary>
+        /// Renders a named section.
+        /// </summary>
+        /// <param name="sectionName">Name of the section to render.</param>
+        /// <param name="required">A value indicating whether the section is required or not.</param>
+        /// <returns>A <see cref="HelperResult"/> that writes the section to the output stream.</returns>
         [ContractAnnotation("null <= required: false; notnull <= required: true")]
         public HelperResult RenderSection(string sectionName, bool required)
         {
@@ -40,7 +61,12 @@ namespace Masb.Mvc.TableBuilder
             return helperResult;
         }
 
-        public bool IsSectionDefined([NotNull] string sectionName)
+        /// <summary>
+        /// Returns a value indicating whether the named section is defined or not.
+        /// </summary>
+        /// <param name="sectionName">Name of the section to test.</param>
+        /// <returns>True if the section is defined; otherwise False.</returns>
+        public bool IsSectionDefined(string sectionName)
         {
             if (sectionName == null)
                 throw new ArgumentNullException("sectionName");
@@ -78,7 +104,7 @@ namespace Masb.Mvc.TableBuilder
         /// <returns>
         /// The <see cref="T:System.Web.Mvc.HtmlHelper"/> object that is used to render HTML elements.
         /// </returns>
-        HtmlHelper<TSubProperty> ITemplateArgs<TSubProperty>.Html
+        HtmlHelper<TSubProperty> IHelperContext<TSubProperty>.Html
         {
             get { return this.templateArgs.Html; }
         }
@@ -91,6 +117,9 @@ namespace Masb.Mvc.TableBuilder
             get { throw new Exception("There is no model while rendering the headings of the table."); }
         }
 
+        /// <summary>
+        /// Gets the <see cref="ModelMetadata"/> associated with this object.
+        /// </summary>
         public ModelMetadata Meta
         {
             get { return this.templateArgs.Meta; }
@@ -110,7 +139,7 @@ namespace Masb.Mvc.TableBuilder
         /// <returns>
         /// The <see cref="T:System.Web.Mvc.AjaxHelper"/> object that is used to render HTML markup using Ajax.
         /// </returns>
-        AjaxHelper ITemplateArgs.Ajax
+        AjaxHelper IHelperContext.Ajax
         {
             get { return this.templateArgs.Ajax; }
         }
@@ -121,7 +150,7 @@ namespace Masb.Mvc.TableBuilder
         /// <returns>
         /// The <see cref="T:System.Web.Mvc.HtmlHelper"/> object that is used to render HTML elements.
         /// </returns>
-        HtmlHelper ITemplateArgs.Html
+        HtmlHelper IHelperContext.Html
         {
             get { return this.templateArgs.Html; }
         }

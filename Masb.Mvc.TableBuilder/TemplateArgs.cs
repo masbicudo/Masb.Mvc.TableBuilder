@@ -1,7 +1,16 @@
-﻿using System.Web.Mvc;
+﻿using System;
+using System.Web.Mvc;
 
 namespace Masb.Mvc.TableBuilder
 {
+    /// <summary>
+    /// Represents the `item` object that is passed to inline helpers,
+    /// when the inline helper renders model information to the page.
+    /// <para>Example:</para>
+    /// <para><code>(<see cref="Func&lt;ITemplateArgs&lt;Person>, HelperResult>"/>)@&lt;div>@item.Html.EditorFor(p => p.Name)&lt;/div></code></para>
+    /// </summary>
+    /// <typeparam name="TModel">Type of the model to render.</typeparam>
+    /// <typeparam name="TInfo">Type of additional data provided to the rendering process.</typeparam>
     public class TemplateArgs<TModel, TInfo> : TemplateArgs<TModel>,
         ITemplateArgsWithData<TModel, TInfo>,
         IViewDataContainer
@@ -12,9 +21,19 @@ namespace Masb.Mvc.TableBuilder
             this.Info = info;
         }
 
+        /// <summary>
+        /// Gets the index of the row.
+        /// </summary>
         public TInfo Info { get; private set; }
     }
 
+    /// <summary>
+    /// Represents the `item` object that is passed to inline helpers,
+    /// when the inline helper renders model information to the page.
+    /// <para>Example:</para>
+    /// <para><code>(<see cref="Func&lt;ITemplateArgs&lt;Person>, HelperResult>"/>)@&lt;div>@item.Html.EditorFor(p => p.Name)&lt;/div></code></para>
+    /// </summary>
+    /// <typeparam name="TModel">Type of the model to render.</typeparam>
     public class TemplateArgs<TModel> :
         ITemplateArgs<TModel>,
         IViewDataContainer
@@ -28,6 +47,9 @@ namespace Masb.Mvc.TableBuilder
             this.Ajax = new AjaxHelper<TModel>(viewContext, this);
         }
 
+        /// <summary>
+        /// Gets the <see cref="ModelMetadata"/> associated with this object.
+        /// </summary>
         public ModelMetadata Meta { get; private set; }
 
         /// <summary>
@@ -49,7 +71,7 @@ namespace Masb.Mvc.TableBuilder
         /// <returns>
         /// The <see cref="T:System.Web.Mvc.AjaxHelper"/> object that is used to render HTML markup using Ajax.
         /// </returns>
-        AjaxHelper ITemplateArgs.Ajax
+        AjaxHelper IHelperContext.Ajax
         {
             get { return this.Ajax; }
         }
@@ -76,7 +98,7 @@ namespace Masb.Mvc.TableBuilder
         /// <returns>
         /// The <see cref="T:System.Web.Mvc.HtmlHelper"/> object that is used to render HTML elements.
         /// </returns>
-        HtmlHelper ITemplateArgs.Html
+        HtmlHelper IHelperContext.Html
         {
             get { return this.Html; }
         }
