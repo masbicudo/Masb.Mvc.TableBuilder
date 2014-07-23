@@ -9,9 +9,9 @@
 @{
     var tableTemplate = this.Html.TableTemplateFor(m => m.Rows)
         .SetColumnSections("ColumnGroup", "HeaderHint")
-        .AddColumnFor(m => m.PersonName, @<div>@item.Meta.GetDisplayName()</div>, @<div>@item.Html.EditorFor(m => m)</div>, @<col style="width: 200px" />, @<text>Name of the person</text>)
-        .AddColumnFor(m => m.BirthDate, @<div>@item.Meta.GetDisplayName()</div>, @<div>@item.Html.EditorFor(m => m)</div>, null, @<text>Date of birth</text>)
-        .AddColumnFor(m => m.Age, @<div>@item.Meta.GetDisplayName()</div>, @<div>@item.Html.EditorFor(m => m)</div>, null, @<text>Age of person</text>)
+        .AddColumnFor(m => m.PersonName, cc => cc.DefaultHeader().Editor().Sections(@<col style="width: 200px" />, @<text>Name of the person</text>))
+        .AddColumnFor(m => m.BirthDate, cc => cc.DefaultHeader().Editor().Section("HeaderHint", @<text>Date of birth</text>))
+        .AddColumnFor(m => m.Age, @<text>@item.Meta.GetDisplayName()</text>, @<div>@item.Html.EditorFor(m => m)</div>, null, @<text>Age of person</text>)
         .AddColumn(
             @<div>Male/Female property</div>,
             @<div>@(item.Model == null || item.Model.Gender == GenderKinds.Male

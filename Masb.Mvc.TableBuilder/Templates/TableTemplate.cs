@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Web.WebPages;
@@ -210,6 +211,15 @@ namespace Masb.Mvc.TableBuilder
         public Expression<Func<TModel, IList<TCollectionItem>>> Expression
         {
             get { return this.collectionExpression; }
+        }
+
+        /// <summary>
+        /// Gets the names of the defined column sections.
+        /// </summary>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public ReadOnlyCollection<string> ColumnSectioNames
+        {
+            get { return new ReadOnlyCollection<string>(this.columnSectioNames); }
         }
 
         /// <summary>
