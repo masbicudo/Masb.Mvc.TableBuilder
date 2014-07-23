@@ -48,5 +48,25 @@ namespace Masb.Mvc.TableBuilder.Sample.Controllers
                 "Index",
                 new TableViewModel());
         }
+
+        public ActionResult TestMvcEditorTemplate()
+        {
+            return this.View(
+                new TestNodeModel
+                {
+                    Name = "Root",
+                    Children = new[]
+                    {
+                        new TestNodeModel { Name = "NodeA", },
+                        new TestNodeModel { Name = "NodeB", },
+                    }
+                });
+        }
+
+        [HttpPost]
+        public ActionResult TestMvcEditorTemplate(TestNodeModel viewModel)
+        {
+            return this.View(viewModel);
+        }
     }
 }

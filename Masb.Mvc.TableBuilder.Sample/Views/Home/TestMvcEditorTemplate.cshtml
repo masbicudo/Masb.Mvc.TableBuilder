@@ -1,0 +1,48 @@
+﻿@using Masb.Mvc.TableBuilder.Sample.Models
+@model TestNodeModel
+@{
+    this.ViewBag.Title = "MVC Editor Template Test";
+    this.Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@section Scripts
+{
+    <script type="text/javascript" src="~/Scripts/jquery-2.1.1.min.js"></script>
+    <script type="text/javascript" src="~/Scripts/tmpl.min.js"></script>
+    <script type="text/javascript" src="~/Scripts/String.js"></script>
+    <script type="text/javascript">
+        $(function() {
+            $("body").on("click", ".add-link", function(e) {
+                e.preventDefault();
+                var collectionId = $(this).attr("data-id");
+                var collectionName = $(this).attr("data-name");
+
+                var $ul = $("#" + collectionId);
+
+                var indexNew = parseInt($(this).attr("data-new-index"));
+
+                $(this).attr("data-new-index", indexNew + 1);
+
+                var htmlItemNew = tmpl("tmpl-demo", { collectionId: collectionId, collectionName: collectionName })
+                    .replaceAll("@int.MaxValue", indexNew);
+
+                $ul.append($(htmlItemNew));
+            });
+        })
+    </script>
+    <script type="text/x-tmpl" id="tmpl-demo">
+    <li>
+        <input type="hidden" name="{%=o.collectionName%}.Index" value="@(int.MaxValue)"/>
+        <p>Name: <input class="text-box single-line" data-val="true" data-val-required="The Name field is required." id="{%=o.collectionId%}_@(int.MaxValue)__Name" name="{%=o.collectionName%}[@(int.MaxValue)].Name" type="text" value=""></p>
+        <ul id="{%=o.collectionId%}_@(int.MaxValue)__Children">
+        </ul>
+        <a href="#" class="add-link" data-id="{%=o.collectionId%}_@(int.MaxValue)__Children" data-name="{%=o.collectionName%}[@(int.MaxValue)].Children" data-new-index="0">ADD ITEM AT {%=o.collectionName%}[@(int.MaxValue)].Children</a>
+    </li>
+    </script>
+}
+@using (this.Html.BeginForm())
+{
+    <text>
+        @this.Html.EditorFor(m => m)
+        <input type="submit" value="send" />
+    </text>
+}

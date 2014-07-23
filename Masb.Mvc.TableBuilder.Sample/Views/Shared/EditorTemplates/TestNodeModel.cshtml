@@ -1,0 +1,26 @@
+﻿@using Masb.Mvc.TableBuilder.Sample.Models
+@model TestNodeModel
+@if (this.Model != null)
+{
+    var hasModel = this.Model != null && this.Model.Children != null;
+    var newIndex = hasModel ? this.Model.Children.Length : 0;
+    <p>Name: @this.Html.EditorFor(m => m.Name)<span>@this.Html.ValidationMessageFor(m => m.Name)</span></p>
+    <div style="font-size: 10px; color: gray; font-family: monospace, 'Courier New';">
+        <p>Props: @string.Join(", ", this.ViewData.ModelMetadata.Properties.Select(p => p.PropertyName))</p>
+        <p>Model States with Error: @string.Join(", ", this.ViewData.ModelState.Where(ms => ms.Value.Errors.Count > 0).Select(ms => ms.Key))</p>
+        <p>HtmlFieldPrefix: @this.ViewData.TemplateInfo.HtmlFieldPrefix</p>
+    </div>
+    <ul id="@this.ViewData.TemplateInfo.GetFullHtmlFieldId("Children")">
+        @if (hasModel && this.Model.Children.Length > 0)
+        {
+            for (int it = 0; it < this.Model.Children.Length; it++)
+            {
+                <li>
+                    <input type="hidden" name="@this.ViewData.TemplateInfo.GetFullHtmlFieldName("Children.Index")" value="@it"/>
+                    @this.Html.EditorFor(m => m.Children[it])
+                </li>
+            }
+        }
+    </ul>
+    <a href="#" class="add-link" data-id="@this.ViewData.TemplateInfo.GetFullHtmlFieldId("Children")" data-name="@this.ViewData.TemplateInfo.GetFullHtmlFieldName("Children")" data-new-index="@newIndex">ADD ITEM AT @this.ViewData.TemplateInfo.GetFullHtmlFieldName("Children")</a>
+}
