@@ -217,7 +217,7 @@ namespace Masb.Mvc.TableBuilder
         /// Gets the names of the defined column sections.
         /// </summary>
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public ReadOnlyCollection<string> ColumnSectioNames
+        public IEnumerable<string> ColumnSectioNames
         {
             get { return new ReadOnlyCollection<string>(this.columnSectioNames); }
         }

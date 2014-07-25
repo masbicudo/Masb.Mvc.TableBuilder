@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -18,7 +19,10 @@ namespace Masb.Mvc.TableBuilder
         IHelperContext<IList<TCollectionItem>>,
         ITableRenderer
     {
+        [NotNull]
         private readonly ITableTemplate<TModel, TCollectionItem> tableTemplate;
+
+        [NotNull]
         private readonly HtmlHelper<TModel> masterHtml;
 
         /// <summary>
@@ -26,8 +30,16 @@ namespace Masb.Mvc.TableBuilder
         /// </summary>
         /// <param name="tableTemplate"> Table template to render. </param>
         /// <param name="masterHtml"> The master <see cref="HtmlHelper"/>. </param>
-        public TableRenderer(ITableTemplate<TModel, TCollectionItem> tableTemplate, HtmlHelper<TModel> masterHtml)
+        public TableRenderer(
+            [NotNull] ITableTemplate<TModel, TCollectionItem> tableTemplate,
+            [NotNull] HtmlHelper<TModel> masterHtml)
         {
+            if (tableTemplate == null)
+                throw new ArgumentNullException("tableTemplate");
+
+            if (masterHtml == null)
+                throw new ArgumentNullException("masterHtml");
+
             this.tableTemplate = tableTemplate;
             this.masterHtml = masterHtml;
             this.lazyViewTemplate = new Lazy<TemplateArgs<IList<TCollectionItem>>>(this.CreateTemplateArgs);
@@ -48,6 +60,8 @@ namespace Masb.Mvc.TableBuilder
         {
             get
             {
+                Debug.Assert(this.tableTemplate.Expression != null, "this.tableTemplate.Expression != null");
+
                 var getter = this.tableTemplate.Expression.Compile();
 
                 // ReSharper disable once CompareNonConstrainedGenericWithNull
@@ -91,13 +105,17 @@ namespace Masb.Mvc.TableBuilder
         /// <param name="index">Index that is going to be considered as a new item.</param>
         /// <param name="defaultModel">Default model that will be used to render this new row.</param>
         /// <returns>A renderer that helps rendering the "new line".</returns>
+        [NotNull]
         public TableDataRowRenderer<TCollectionItem> NewItem(int index, TCollectionItem defaultModel)
         {
             return this.CreateItem(defaultModel, index, true);
         }
 
+        [NotNull]
         private TableDataRowRenderer<TCollectionItem> CreateItem(TCollectionItem item, int index, bool isNewRow)
         {
+            Debug.Assert(this.tableTemplate.Expression != null, "this.tableTemplate.Expression != null");
+
             var indexHiddenFieldName = this.masterHtml.ViewContext.ViewData.TemplateInfo.GetFullHtmlFieldName(
                 ExpressionHelper.GetExpressionText(this.tableTemplate.Expression)) + ".Index";
 
@@ -107,8 +125,7 @@ namespace Masb.Mvc.TableBuilder
             Expression<Func<TModel, TCollectionItem>> indexerLambda;
             {
                 var expression = this.tableTemplate.Expression;
-                var lambda = expression as LambdaExpression;
-                var body = lambda.Body;
+                var body = expression.Body;
                 if (body.NodeType == ExpressionType.Convert)
                     body = ((UnaryExpression)body).Operand;
 
@@ -118,7 +135,7 @@ namespace Masb.Mvc.TableBuilder
                         body,
                         Expression.Constant(index));
 
-                    indexerLambda = Expression.Lambda<Func<TModel, TCollectionItem>>(indexer, lambda.Parameters);
+                    indexerLambda = Expression.Lambda<Func<TModel, TCollectionItem>>(indexer, expression.Parameters);
                 }
                 else
                 {
@@ -164,7 +181,7 @@ namespace Masb.Mvc.TableBuilder
                         indexerPropInfo.GetGetMethod(),
                         new Expression[] { Expression.Constant(index) });
 
-                    indexerLambda = Expression.Lambda<Func<TModel, TCollectionItem>>(indexer, lambda.Parameters);
+                    indexerLambda = Expression.Lambda<Func<TModel, TCollectionItem>>(indexer, expression.Parameters);
                 }
             }
 
@@ -252,6 +269,7 @@ namespace Masb.Mvc.TableBuilder
         [CanBeNull]
         private HelperResult GetHelperResult([NotNull] string sectionName)
         {
+            Debug.Assert(sectionName != null, "sectionName != null");
             if (!this.tableTemplate.IsSectionDefined(sectionName, this.lazyViewTemplate.Value))
                 return null;
 
@@ -270,6 +288,7 @@ namespace Masb.Mvc.TableBuilder
                 this.masterHtml = masterHtml;
             }
 
+            [NotNull]
             public TableHeaderRowRenderer Visit<TCollectionItem1>(ITableTemplate<TModel, TCollectionItem1> value)
             {
                 var creator = new TableHeaderCellRendererCreator<TCollectionItem1>(this.masterHtml);
@@ -292,7 +311,8 @@ namespace Masb.Mvc.TableBuilder
                 {
                     var viewData = new ViewDataDictionary<TSubProperty>
                     {
-                        // Commented code: This code is commented to show what IS NOT NEEDED in this case, because this is a HEADER CELL.
+                        // Commented code: This code is commented to show what IS NOT NEEDED in this case,
+                        // Commented code:     because this is a HEADER CELL.
                         ////TemplateInfo =
                         ////{
                         ////    HtmlFieldPrefix = this.html.ViewContext.ViewData.TemplateInfo.GetFullHtmlFieldName(
@@ -322,6 +342,7 @@ namespace Masb.Mvc.TableBuilder
 
         private TemplateArgs<IList<TCollectionItem>> CreateTemplateArgs()
         {
+            Debug.Assert(this.tableTemplate.Expression != null, "this.tableTemplate.Expression != null");
             var getter = this.tableTemplate.Expression.Compile();
             var collection = getter(this.masterHtml.ViewData.Model);
             var viewData = new ViewDataDictionary<IList<TCollectionItem>>(collection)

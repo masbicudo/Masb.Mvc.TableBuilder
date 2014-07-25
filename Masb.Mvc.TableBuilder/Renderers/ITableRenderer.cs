@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using JetBrains.Annotations;
 
 namespace Masb.Mvc.TableBuilder
 {
@@ -12,11 +13,13 @@ namespace Masb.Mvc.TableBuilder
         /// <summary>
         /// Gets the header renderer.
         /// </summary>
+        [NotNull]
         TableHeaderRowRenderer Header { get; }
 
         /// <summary>
         /// Gets a renderer for each item in the table.
         /// </summary>
+        [NotNull]
         IEnumerable<ITableDataRowRenderer> Items { get; }
 
         /// <summary>
@@ -25,6 +28,7 @@ namespace Masb.Mvc.TableBuilder
         /// <param name="index">Index that is going to be considered as a new item.</param>
         /// <param name="defaultModel">Default model that will be used to render this new row.</param>
         /// <returns>A renderer that helps rendering the "new line".</returns>
+        [NotNull]
         ITableDataRowRenderer NewItem(int index, object defaultModel);
 
         /// <summary>
@@ -32,6 +36,7 @@ namespace Masb.Mvc.TableBuilder
         /// </summary>
         /// <param name="index">Index that is going to be considered as a new item.</param>
         /// <returns>A renderer that helps rendering the "new line".</returns>
+        [NotNull]
         ITableDataRowRenderer NewItem(int index);
     }
 }

@@ -2,18 +2,24 @@ using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Web.Mvc;
+using JetBrains.Annotations;
 
 namespace Masb.Mvc.TableBuilder
 {
     public static class HtmlHelperExtensions
     {
+        [NotNull]
         public static TableTemplate<TModel, TCollectionItem> TableTemplateFor<TModel, TCollectionItem>(
-            this HtmlHelper<TModel> html,
+            [NotNull] this HtmlHelper<TModel> html,
             Expression<Func<TModel, IList<TCollectionItem>>> collectionExpression)
         {
+            if (html == null)
+                throw new ArgumentNullException("html");
+
             return new TableTemplate<TModel, TCollectionItem>(collectionExpression);
         }
 
+        [NotNull]
         public static TableRenderer<TModel, TCollectionItem> Table<TModel, TCollectionItem>(
             this HtmlHelper<TModel> html,
             ITableTemplate<TModel, TCollectionItem> tableTemplate)
@@ -21,6 +27,7 @@ namespace Masb.Mvc.TableBuilder
             return new TableRenderer<TModel, TCollectionItem>(tableTemplate, html);
         }
 
+        [NotNull]
         public static ITableRenderer Table<TModel>(
             this HtmlHelper<TModel> html,
             ITableTemplate<TModel> tableTemplate)
@@ -28,6 +35,7 @@ namespace Masb.Mvc.TableBuilder
             return tableTemplate.Accept(new TableRendererCreator<TModel>(html));
         }
 
+        [NotNull]
         public static ITableRenderer Table(
             this HtmlHelper html,
             ITableTemplate tableTemplate)
@@ -40,14 +48,15 @@ namespace Masb.Mvc.TableBuilder
         {
             private readonly HtmlHelper html;
 
-            public TableRendererCreator(HtmlHelper html)
+            public TableRendererCreator([NotNull] HtmlHelper html)
             {
                 this.html = html;
             }
 
+            [NotNull]
             public ITableRenderer Visit<TModel, TCollectionItem>(ITableTemplate<TModel, TCollectionItem> value)
             {
-                return new TableRenderer<TModel, TCollectionItem>(value, (HtmlHelper<TModel>)html);
+                return new TableRenderer<TModel, TCollectionItem>(value, (HtmlHelper<TModel>)this.html);
             }
         }
 
@@ -56,14 +65,15 @@ namespace Masb.Mvc.TableBuilder
         {
             private readonly HtmlHelper<TModel> html;
 
-            public TableRendererCreator(HtmlHelper<TModel> html)
+            public TableRendererCreator([NotNull] HtmlHelper<TModel> html)
             {
                 this.html = html;
             }
 
+            [NotNull]
             public ITableRenderer Visit<TCollectionItem>(ITableTemplate<TModel, TCollectionItem> value)
             {
-                return new TableRenderer<TModel, TCollectionItem>(value, html);
+                return new TableRenderer<TModel, TCollectionItem>(value, this.html);
             }
         }
     }

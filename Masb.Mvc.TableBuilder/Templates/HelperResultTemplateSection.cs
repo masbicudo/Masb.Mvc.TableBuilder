@@ -27,7 +27,7 @@ namespace Masb.Mvc.TableBuilder
         /// <returns>
         /// If True, indicates that the section can be rendered; otherwise the section cannot be rendered.
         /// </returns>
-        public virtual bool CanRender(TInput input)
+        public bool CanRender(TInput input)
         {
             return this.predicate == null || this.predicate(input);
         }
@@ -37,7 +37,7 @@ namespace Masb.Mvc.TableBuilder
         /// </summary>
         /// <param name="input"> The input that is going to be used. </param>
         /// <returns> Result representing the rendered section. </returns>
-        public virtual HelperResult Render(TInput input)
+        public HelperResult Render(TInput input)
         {
             return this.helper(input);
         }
