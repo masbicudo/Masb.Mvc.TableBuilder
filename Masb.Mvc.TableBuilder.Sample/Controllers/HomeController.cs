@@ -42,11 +42,18 @@ namespace Masb.Mvc.TableBuilder.Sample.Controllers
                 });
         }
 
-        public ActionResult Null()
+        public ActionResult NullCollection()
         {
             return this.View(
                 "Index",
                 new TableViewModel());
+        }
+
+        public ActionResult Null()
+        {
+            return this.View(
+                "Index",
+                null);
         }
 
         public ActionResult NoSections()

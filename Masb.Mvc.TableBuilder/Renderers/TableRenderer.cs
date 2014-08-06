@@ -344,7 +344,18 @@ namespace Masb.Mvc.TableBuilder
         {
             Debug.Assert(this.tableTemplate.Expression != null, "this.tableTemplate.Expression != null");
             var getter = this.tableTemplate.Expression.Compile();
-            var collection = getter(this.masterHtml.ViewData.Model);
+            var model = this.masterHtml.ViewData.Model;
+            var collection = default(IList<TCollectionItem>);
+
+            try
+            {
+                if (model != null)
+                    collection = getter(model);
+            }
+            catch (NullReferenceException)
+            {
+            }
+
             var viewData = new ViewDataDictionary<IList<TCollectionItem>>(collection)
             {
                 TemplateInfo =

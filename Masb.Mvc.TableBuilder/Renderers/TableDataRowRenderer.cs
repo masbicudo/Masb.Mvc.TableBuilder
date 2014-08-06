@@ -68,7 +68,8 @@ namespace Masb.Mvc.TableBuilder
                 TSubProperty model = default(TSubProperty);
                 try
                 {
-                    model = modelGetter(rootModel);
+                    if (rootModel != null)
+                        model = modelGetter(rootModel);
                 }
                 catch (NullReferenceException)
                 {
