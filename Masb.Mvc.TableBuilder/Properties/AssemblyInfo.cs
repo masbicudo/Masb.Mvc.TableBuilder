@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Masb Mvc TableBuilder for MVC 4")]
+[assembly: AssemblyTitle("Masb MVC TableBuilder for MVC 4")]
 [assembly: AssemblyDescription("Minimalist ASP.NET MVC Html Helper to help rendering tabular data, separating the headings and data cells from the table structure.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Miguel Angelo")]
@@ -31,5 +31,7 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.0.13.0")]
-[assembly: AssemblyFileVersion("1.0.13.0")]
+[assembly: AssemblyVersion("1.13.1.0")]
+[assembly: AssemblyFileVersion("1.13.1.0")]
+
+[assembly: AssemblyInformationalVersion("1.13.1")]
