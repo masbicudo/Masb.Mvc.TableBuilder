@@ -49,6 +49,31 @@ namespace Masb.Mvc.TableBuilder.Sample.Controllers
                 new TableViewModel());
         }
 
+        public ActionResult NoSections()
+        {
+            return this.View(
+                new TableViewModel
+                {
+                    Rows = new List<RowViewModel>
+                    {
+                        new RowViewModel
+                        {
+                            PersonName = "Miguel Angelo",
+                            BirthDate = new DateTime(1984, 05, 04),
+                            Gender = GenderKinds.Male,
+                            MaleProp = "Male prop"
+                        },
+                        new RowViewModel
+                        {
+                            PersonName = "Maria Luiza",
+                            BirthDate = new DateTime(1986, 09, 27),
+                            Gender = GenderKinds.Female,
+                            FemaleProp = "Female prop"
+                        },
+                    }
+                });
+        }
+
         public ActionResult TestMvcEditorTemplate()
         {
             return this.View(

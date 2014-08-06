@@ -1,0 +1,21 @@
+﻿@using Masb.Mvc.TableBuilder
+@using Masb.Mvc.TableBuilder.Sample
+@using Masb.Mvc.TableBuilder.Sample.Models
+@model TableViewModel
+@{
+    this.ViewBag.Title = "Sample Table Page";
+    this.Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@{
+    var tableTemplate = this.Html.TableTemplateFor(m => m.Rows)
+        .AddColumnFor(m => m.PersonName, cc => cc.DefaultHeader().Editor())
+        .AddColumnFor(m => m.BirthDate, cc => cc.DefaultHeader().Editor())
+        .AddColumnFor(m => m.Age, @<text>@item.Meta.GetDisplayName()</text>, @<div>@item.Html.EditorFor(m => m)</div>)
+        .AddColumn(
+            @<div>Male/Female property</div>,
+            @<div>@(item.Model == null || item.Model.Gender == GenderKinds.Male
+                        ? item.Html.EditorFor(m => m.MaleProp)
+                        : item.Html.EditorFor(m => m.FemaleProp))
+             </div>);
+}
+@this.Html.MyCustomTableNoSections(tableTemplate)

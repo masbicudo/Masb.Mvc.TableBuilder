@@ -10,5 +10,11 @@ namespace Masb.Mvc.TableBuilder.Sample
             var result = ASP.TableFrames.MyCustomTable(html, tableTemplate);
             return result;
         }
+
+        public static HelperResult MyCustomTableNoSections<TModel>(this HtmlHelper<TModel> html, ITableTemplate<TModel> tableTemplate)
+        {
+            var result = ASP.TableFrames.MyCustomTableNoSections(html, tableTemplate);
+            return result;
+        }
     }
 }

@@ -85,3 +85,69 @@
         }
     </table>
 }
+@helper MyCustomTableNoSections(HtmlHelper html, ITableTemplate tableTemplate)
+{
+    var table = html.Table(tableTemplate);
+    <table id="@table.Html.ViewData.TemplateInfo.GetFullHtmlFieldId("")">
+        @{
+            // getting all items... just testing (so to show that it is possible)
+            // and rendering these models to JSON
+            var allItems = table.Items.Select(item => item.Html.ViewData.Model).ToArray();
+            <script type="text/javascript">
+                Models = @(html.Raw(new JavaScriptSerializer().Serialize(allItems)));
+            </script>
+
+            var header = table.Header;
+            <thead>
+                <tr>
+                    @foreach (var headerColumn in header.Cells)
+                    {
+                        <th>
+                            @headerColumn.Render()
+                        </th>
+                    }
+                </tr>
+            </thead>
+        }
+        @if (table.Items.Any())
+        {
+            // rendering table items, if any
+            <tbody>
+                @foreach (var obj in table.Items)
+                {
+                    <tr id="@obj.Html.ViewData.TemplateInfo.GetFullHtmlFieldId("")">
+                        @obj.RenderIndexHiddenField()
+                        @foreach (var itemColumn in obj.Cells)
+                        {
+                            // rendering table data cells
+                            <td id="@itemColumn.Html.ViewData.TemplateInfo.GetFullHtmlFieldId("Cell")">
+                                @itemColumn.Render()
+                            </td>
+                        }
+                    </tr>
+                }
+                @{
+                // rendering a row that allows new items to be inserted
+                var newItem = table.NewItem(int.MaxValue, null); 
+                    <tr>
+                        @newItem.RenderIndexHiddenField()
+                        @foreach (var itemColumn in newItem.Cells)
+                        {
+                            <td>
+                                @itemColumn.Render()
+                            </td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        }
+        else
+        {
+            <tbody>
+                <tr>
+                    <td colspan="@table.Header.Cells.Count()">Empty table</td>
+                </tr>
+            </tbody>
+        }
+    </table>
+}
