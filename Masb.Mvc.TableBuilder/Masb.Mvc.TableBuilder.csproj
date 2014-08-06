@@ -76,6 +76,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Helpers\DicExtensions.cs" />
+    <Compile Include="FluentColumnConfig.cs" />
+    <Compile Include="FluentColumnConfigExtensions.cs" />
     <Compile Include="TableTemplateExtensions.cs" />
     <Compile Include="HtmlHelperExtensions.cs" />
     <Compile Include="IHelperContext.cs" />
