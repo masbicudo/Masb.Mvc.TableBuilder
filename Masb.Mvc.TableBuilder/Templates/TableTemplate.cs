@@ -28,6 +28,7 @@ namespace Masb.Mvc.TableBuilder
         private readonly Dictionary<string, ITemplateSection<ITemplateArgsWithData<TCollectionItem, RowInfo>, HelperResult>> itemSections
             = new Dictionary<string, ITemplateSection<ITemplateArgsWithData<TCollectionItem, RowInfo>, HelperResult>>();
 
+        [CanBeNull]
         private string[] columnSectioNames;
 
         /// <summary>
@@ -217,9 +218,14 @@ namespace Masb.Mvc.TableBuilder
         /// Gets the names of the defined column sections.
         /// </summary>
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public ReadOnlyCollection<string> ColumnSectioNames
+        public IEnumerable<string> ColumnSectioNames
         {
-            get { return new ReadOnlyCollection<string>(this.columnSectioNames); }
+            get
+            {
+                return this.columnSectioNames == null || this.columnSectioNames.Length == 0
+                    ? Enumerable.Empty<string>()
+                    : new ReadOnlyCollection<string>(this.columnSectioNames);
+            }
         }
 
         /// <summary>

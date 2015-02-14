@@ -1,5 +1,4 @@
-﻿using System;
-using System.Web.Mvc;
+﻿using System.Web.Mvc;
 
 namespace Masb.Mvc.TableBuilder
 {
@@ -7,13 +6,12 @@ namespace Masb.Mvc.TableBuilder
     /// Represents the `item` object that is passed to inline helpers,
     /// when the inline helper renders model information to the page.
     /// <para>Example:</para>
-    /// <para><code>(<see cref="Func&lt;ITemplateArgs&lt;Person>, HelperResult>"/>)@&lt;div>@item.Html.EditorFor(p => p.Name)&lt;/div></code></para>
+    /// <para><code>(Func&lt;ITemplateArgs&lt;Person>, HelperResult>)@&lt;div>@item.Html.EditorFor(p => p.Name)&lt;/div></code></para>
     /// </summary>
     /// <typeparam name="TModel">Type of the model to render.</typeparam>
     /// <typeparam name="TInfo">Type of additional data provided to the rendering process.</typeparam>
     public class TemplateArgs<TModel, TInfo> : TemplateArgs<TModel>,
-        ITemplateArgsWithData<TModel, TInfo>,
-        IViewDataContainer
+        ITemplateArgsWithData<TModel, TInfo>
     {
         public TemplateArgs(ViewDataDictionary<TModel> viewData, ViewContext viewContext, TInfo info)
             : base(viewData, viewContext)
@@ -31,7 +29,7 @@ namespace Masb.Mvc.TableBuilder
     /// Represents the `item` object that is passed to inline helpers,
     /// when the inline helper renders model information to the page.
     /// <para>Example:</para>
-    /// <para><code>(<see cref="Func&lt;ITemplateArgs&lt;Person>, HelperResult>"/>)@&lt;div>@item.Html.EditorFor(p => p.Name)&lt;/div></code></para>
+    /// <para><code>(Func&lt;ITemplateArgs&lt;Person>, HelperResult>)@&lt;div>@item.Html.EditorFor(p => p.Name)&lt;/div></code></para>
     /// </summary>
     /// <typeparam name="TModel">Type of the model to render.</typeparam>
     public class TemplateArgs<TModel> :

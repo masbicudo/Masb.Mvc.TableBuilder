@@ -68,7 +68,8 @@ namespace Masb.Mvc.TableBuilder
                 TSubProperty model = default(TSubProperty);
                 try
                 {
-                    model = modelGetter(rootModel);
+                    if (rootModel != null)
+                        model = modelGetter(rootModel);
                 }
                 catch (NullReferenceException)
                 {
@@ -218,7 +219,7 @@ namespace Masb.Mvc.TableBuilder
         /// <param name="sectionName">Name of the section to render.</param>
         /// <param name="required">A value indicating whether the section is required or not.</param>
         /// <returns>A <see cref="HelperResult"/> that writes the section to the output stream.</returns>
-        [ContractAnnotation("null <= required: false; notnull <= required: true")]
+        [ContractAnnotation("canbenull <= required: false; notnull <= required: true")]
         public HelperResult RenderSection(string sectionName, bool required)
         {
             if (sectionName == null)

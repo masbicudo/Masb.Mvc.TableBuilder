@@ -143,6 +143,7 @@
     <Content Include="Scripts\jquery-2.1.1.min.map" />
     <Content Include="Views\Home\Paged.cshtml" />
     <Content Include="Views\Home\Single.cshtml" />
+    <Content Include="Views\Home\NoSections.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

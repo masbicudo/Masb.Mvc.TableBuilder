@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using JetBrains.Annotations;
 
 namespace Masb.Mvc.TableBuilder
 {
@@ -51,6 +52,7 @@ namespace Masb.Mvc.TableBuilder
         /// <summary>
         /// Gets the expression that retrieves a list of <typeparamref name="TCollectionItem"/> from a <typeparamref name="TModel"/>.
         /// </summary>
+        [NotNull]
         Expression<Func<TModel, IList<TCollectionItem>>> Expression { get; }
     }
 }

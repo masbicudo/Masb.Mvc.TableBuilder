@@ -22,7 +22,7 @@ namespace Masb.Mvc.TableBuilder
         /// <param name="sectionName">Name of the section to render.</param>
         /// <param name="required">A value indicating whether the section is required or not.</param>
         /// <returns>A <see cref="HelperResult"/> that writes the section to the output stream.</returns>
-        [ContractAnnotation("null <= required: false; notnull <= required: true")]
+        [ContractAnnotation("canbenull <= required: false; notnull <= required: true")]
         HelperResult RenderSection([NotNull] string sectionName, bool required);
 
         /// <summary>
