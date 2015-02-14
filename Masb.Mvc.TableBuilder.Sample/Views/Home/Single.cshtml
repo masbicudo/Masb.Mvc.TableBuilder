@@ -1,0 +1,16 @@
+﻿@using Masb.Mvc.TableBuilder
+@using Masb.Mvc.TableBuilder.Sample
+@using Masb.Mvc.TableBuilder.Sample.Models
+@model RowViewModel
+@{
+    this.ViewBag.Title = "Sample Table Page";
+    this.Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@using (this.Html.BeginForm())
+{
+    <text>
+        @this.Html.ValidationSummary()
+        @this.Html.EditorFor(x => x.BirthDate)
+    </text>
+    <button type="submit">Send</button>
+}

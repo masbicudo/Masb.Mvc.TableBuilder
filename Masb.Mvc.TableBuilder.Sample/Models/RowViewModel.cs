@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace Masb.Mvc.TableBuilder.Sample.Models
 {
@@ -8,6 +9,7 @@ namespace Masb.Mvc.TableBuilder.Sample.Models
 
         public DateTime BirthDate { get; set; }
 
+        [Required]
         public GenderKinds Gender { get; set; }
 
         public string MaleProp { get; set; }

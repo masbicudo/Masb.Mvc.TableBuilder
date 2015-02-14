@@ -49,6 +49,22 @@ namespace Masb.Mvc.TableBuilder.Sample.Controllers
                 new TableViewModel());
         }
 
+        public ActionResult Paged()
+        {
+            return this.View();
+        }
+
+        public ActionResult Single()
+        {
+            return this.View();
+        }
+
+        [HttpPost]
+        public ActionResult Single(RowViewModel row)
+        {
+            return this.View(row);
+        }
+
         public ActionResult TestMvcEditorTemplate()
         {
             return this.View(
